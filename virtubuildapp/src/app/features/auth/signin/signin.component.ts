@@ -9,7 +9,10 @@ import {
 import { CommonModule } from '@angular/common';
 import { AuthenticationService } from '@/app/core/services';
 import { Store } from '@ngrx/store';
-import { setUserProfile, setUserType } from '@/app/core/store/user/user.actions';
+import {
+  setUserProfile,
+  setUserType,
+} from '@/app/core/store/user/user.actions';
 import { Router } from '@angular/router';
 import { FormInputComponent } from '@/app/shared/components/ui/form/form-input/form-input.component';
 import { getErrorMessage } from '@/app/shared/utils/form.utils';
@@ -39,8 +42,13 @@ export class SigninComponent {
   healthMessage = '';
   showErrorDialog = false;
   errorMessage = '';
+  isSubmitting = false;
 
-  constructor(private fb: FormBuilder, private store: Store, private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private store: Store,
+    private router: Router
+  ) {
     this.signinForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
@@ -78,31 +86,15 @@ export class SigninComponent {
 
   async onSubmit() {
     if (this.signinForm.valid && this.healthStatus === 'ok') {
-      try {
-        const { email, password } = this.signinForm.value;
-        const decoded = await AuthenticationService.signin(email, password);
-        const role = decoded?.user?.roleName;
-        const id = decoded?.user?.id;
-        const name = decoded?.user?.name || decoded?.user?.email || '';
-        const avatar = decoded?.user?.avatar || undefined;
-        this.store.dispatch(setUserType({ userType: (role || '').toLowerCase() } as any));
-        this.store.dispatch(setUserProfile({ id, name, email, avatar }));
-        if (role?.toLowerCase() === 'instructor') {
-          this.router.navigate(['/instructor/']);
-        } else if (role?.toLowerCase() === 'admin') {
-          this.router.navigate(['/admin/']);
-        } else {
-          this.router.navigate(['/student/']);
-        }
-      } catch (error: any) {
-        if (error.response?.status === 401) {
-          this.errorMessage = 'Invalid credentials provided';
-          this.showErrorDialog = true;
-        } else {
-          this.errorMessage = 'An error occurred during login. Please try again.';
-          this.showErrorDialog = true;
-        }
-      }
+      this.isSubmitting = true;
+
+      // Simulate connection delay
+      const delay = Math.floor(Math.random() * (5000 - 3000 + 1)) + 3000;
+      await new Promise((resolve) => setTimeout(resolve, delay));
+
+      this.isSubmitting = false;
+      this.errorMessage = 'Connection timeout';
+      this.showErrorDialog = true;
     }
   }
 
