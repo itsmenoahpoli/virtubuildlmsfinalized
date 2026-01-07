@@ -1,0 +1,132 @@
+<app-dashboard-layout [appTitle]="appTitle">
+<div class="assessment-submissions">
+  <div class="page-header">
+    <h1>Assessment Submissions</h1>
+    <p>Take assessments and track your submission history</p>
+  </div>
+
+  <div class="submissions-content" *ngIf="!loading">
+    <!-- Available Assessments -->
+    <div class="available-assessments-section">
+      <div class="section-header">
+        <h2>Available Assessments</h2>
+        <p>Assessments you can take</p>
+      </div>
+      <div class="assessments-grid">
+        <div class="assessment-card" *ngFor="let assessment of mySubmissions">
+          <div class="assessment-header">
+            <h3>{{ assessment.title }}</h3>
+            <span class="assessment-status" [class]="'status-' + getStatusColor(assessment.status)">
+              {{ assessment.status?.toUpperCase() || 'NOT STARTED' }}
+            </span>
+          </div>
+          <div class="assessment-content">
+            <p class="assessment-description">{{ assessment.description }}</p>
+            <div class="assessment-meta">
+              <div class="meta-item">
+                <span class="meta-label">Module:</span>
+                <span class="meta-value">{{ assessment.moduleTitle }}</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Questions:</span>
+                <span class="meta-value">{{ assessment.questionCount || 0 }}</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Time Limit:</span>
+                <span class="meta-value">{{ assessment.timeLimit || 'No limit' }}</span>
+              </div>
+            </div>
+            <div class="assessment-actions">
+              <button class="btn btn-primary"
+                      *ngIf="assessment.status !== 'completed'"
+                      (click)="startAssessment(assessment)">
+                {{ assessment.status === 'in-progress' ? 'Continue' : 'Start Assessment' }}
+              </button>
+              <button class="btn btn-secondary"
+                      *ngIf="assessment.status === 'completed'"
+                      (click)="viewResults(assessment)">
+                View Results
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submission History -->
+    <div class="history-section">
+      <div class="section-header">
+        <h2>Submission History</h2>
+        <p>Your completed assessments and scores</p>
+      </div>
+      <div class="history-list">
+        <div class="history-item" *ngFor="let submission of myHistory">
+          <div class="submission-info">
+            <h4>{{ submission.assessmentTitle }}</h4>
+            <p>{{ submission.moduleTitle }}</p>
+            <div class="submission-meta">
+              <span class="submission-date">{{ submission.submittedAt | date:'short' }}</span>
+              <span class="submission-time">{{ submission.timeSpent }}s</span>
+            </div>
+          </div>
+          <div class="submission-score">
+            <div class="score-circle" [class]="'score-' + getScoreColor(submission.score)">
+              <span class="score-value">{{ submission.score }}%</span>
+            </div>
+            <div class="score-details">
+              <div class="score-label">Final Score</div>
+              <div class="score-feedback" *ngIf="submission.feedback">
+                {{ submission.feedback }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assessment Form Modal -->
+  <div class="modal-overlay" *ngIf="showSubmitForm" (click)="cancelSubmission()">
+    <div class="modal assessment-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ selectedAssessment?.title }}</h2>
+        <button class="close-btn" (click)="cancelSubmission()">×</button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="submitAssessment()">
+          <div class="assessment-questions" *ngIf="selectedAssessment">
+            <div class="question-item" *ngFor="let question of selectedAssessment.questions; let i = index">
+              <h4>Question {{ i + 1 }}</h4>
+              <p>{{ question.text }}</p>
+              <div class="question-options">
+                <div class="option-item" *ngFor="let option of question.options; let j = index">
+                  <label>
+                    <input type="radio"
+                           [name]="'question_' + i"
+                           [value]="j"
+                           [(ngModel)]="submissionData.answers[i]">
+                    {{ option }}
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" (click)="cancelSubmission()">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary">
+              Submit Assessment
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Loading assessments...</p>
+  </div>
+</div>
+</app-dashboard-layout>

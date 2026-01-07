@@ -1,0 +1,272 @@
+<app-dashboard-layout [appTitle]="'VirtuBuild'">
+  <app-page-shell title="Manage Instructors" subtitle="Manage instructor accounts and permissions">
+    <div class="page-header">
+      <h1>Instructor Management</h1>
+      <button class="btn btn-primary" (click)="showCreateForm = true">
+        Add New Instructor
+      </button>
+    </div>
+
+    <div class="loading" *ngIf="loading">
+      Loading instructors...
+    </div>
+
+    <div class="content" *ngIf="!loading">
+      <!-- Data Table Controls -->
+      <div class="table-controls">
+        <div class="search-section">
+          <div class="search-box">
+            <input
+              type="text"
+              [(ngModel)]="searchTerm"
+              (input)="onSearchChange()"
+              placeholder="Search instructors by name or email..."
+              class="search-input"
+            >
+            <span class="search-icon">🔍</span>
+          </div>
+        </div>
+        
+        <div class="table-info">
+          <span class="results-count">
+            Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to 
+            {{ Math.min(currentPage * itemsPerPage, totalItems) }} of 
+            {{ totalItems }} instructors
+          </span>
+          
+          <div class="items-per-page">
+            <label>Show:</label>
+            <select 
+              [(ngModel)]="itemsPerPage" 
+              (change)="onItemsPerPageChange(itemsPerPage)"
+              class="page-select"
+            >
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data Table -->
+      <div class="instructors-table">
+        <table>
+          <thead>
+            <tr>
+              <th (click)="sort('firstName')" class="sortable">
+                Name
+                <span class="sort-indicator" *ngIf="sortField === 'firstName'">
+                  {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                </span>
+              </th>
+              <th (click)="sort('email')" class="sortable">
+                Email
+                <span class="sort-indicator" *ngIf="sortField === 'email'">
+                  {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                </span>
+              </th>
+              <th (click)="sort('isEnabled')" class="sortable">
+                Status
+                <span class="sort-indicator" *ngIf="sortField === 'isEnabled'">
+                  {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                </span>
+              </th>
+              <th>Role</th>
+              <th (click)="sort('lastLoginAt')" class="sortable">
+                Last Login
+                <span class="sort-indicator" *ngIf="sortField === 'lastLoginAt'">
+                  {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                </span>
+              </th>
+              <th class="actions-header">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let instructor of paginatedInstructors; trackBy: trackByInstructorId">
+              <td>
+                <div class="instructor-info">
+                  <div class="instructor-avatar">
+                    {{ instructor.firstName.charAt(0) }}{{ instructor.lastName.charAt(0) }}
+                  </div>
+                  <div class="instructor-details">
+                    <span class="instructor-name">{{ instructor.firstName }} {{ instructor.lastName }}</span>
+                    <span class="instructor-id">ID: {{ instructor.id }}</span>
+                  </div>
+                </div>
+              </td>
+              <td class="email-cell">{{ instructor.email }}</td>
+              <td>
+                <span class="status-badge" [class]="instructor.isEnabled ? 'active' : 'inactive'">
+                  <span class="status-dot"></span>
+                  {{ instructor.isEnabled ? 'Active' : 'Inactive' }}
+                </span>
+              </td>
+              <td>
+                <span class="role-badge">{{ getRoleName(instructor) }}</span>
+              </td>
+              <td class="last-login-cell">
+                <span *ngIf="instructor.lastLoginAt; else neverLoggedIn">
+                  {{ instructor.lastLoginAt | date:'MMM d, y' }}
+                  <br>
+                  <small>{{ instructor.lastLoginAt | date:'h:mm a' }}</small>
+                </span>
+                <ng-template #neverLoggedIn>
+                  <span class="never-logged-in">Never</span>
+                </ng-template>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button 
+                    class="btn btn-sm btn-secondary" 
+                    (click)="editInstructor(instructor)"
+                    title="Edit Instructor"
+                  >
+                    Edit
+                  </button>
+                  <button 
+                    class="btn btn-sm" 
+                    [class]="instructor.isEnabled ? 'btn-warning' : 'btn-success'"
+                    (click)="toggleInstructorStatus(instructor)"
+                    [title]="instructor.isEnabled ? 'Disable Account' : 'Enable Account'"
+                  >
+                    {{ instructor.isEnabled ? 'Disable' : 'Enable' }}
+                  </button>
+                  <button 
+                    class="btn btn-sm btn-info" 
+                    (click)="resetInstructorPassword(instructor)"
+                    title="Reset Password"
+                  >
+                    Reset PW
+                  </button>
+                  <button 
+                    class="btn btn-sm btn-danger" 
+                    (click)="deleteInstructor(instructor.id)"
+                    title="Delete Instructor"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <!-- Empty State -->
+        <div class="empty-state" *ngIf="filteredInstructors.length === 0">
+          <div class="empty-icon">👨‍🏫</div>
+          <h3>No Instructors Found</h3>
+          <p *ngIf="searchTerm">
+            No instructors match your search criteria. Try adjusting your search terms.
+          </p>
+          <p *ngIf="!searchTerm">
+            No instructors have been added yet. Click "Add New Instructor" to get started.
+          </p>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination" *ngIf="totalPages > 1">
+        <div class="pagination-info">
+          Page {{ currentPage }} of {{ totalPages }}
+        </div>
+        
+        <div class="pagination-controls">
+          <button 
+            class="btn btn-sm btn-secondary"
+            (click)="onPageChange(currentPage - 1)"
+            [disabled]="currentPage === 1"
+          >
+            Previous
+          </button>
+          
+          <div class="page-numbers">
+            <button
+              *ngFor="let page of getPageNumbers()"
+              class="page-btn"
+              [class.active]="page === currentPage"
+              (click)="onPageChange(page)"
+            >
+              {{ page }}
+            </button>
+          </div>
+          
+          <button 
+            class="btn btn-sm btn-secondary"
+            (click)="onPageChange(currentPage + 1)"
+            [disabled]="currentPage === totalPages"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create Instructor Modal -->
+    <div class="modal-overlay" *ngIf="showCreateForm" (click)="cancelCreate()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Create New Instructor</h2>
+          <button class="close-btn" (click)="cancelCreate()">&times;</button>
+        </div>
+        <form (ngSubmit)="createInstructor()">
+          <div class="form-group">
+            <label for="firstName">First Name</label>
+            <input type="text" id="firstName" [(ngModel)]="newInstructor.firstName" name="firstName" required>
+          </div>
+          <div class="form-group">
+            <label for="lastName">Last Name</label>
+            <input type="text" id="lastName" [(ngModel)]="newInstructor.lastName" name="lastName" required>
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" [(ngModel)]="newInstructor.email" name="email" required>
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" [(ngModel)]="newInstructor.password" name="password" required>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" (click)="cancelCreate()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Create Instructor</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Edit Instructor Modal -->
+    <div class="modal-overlay" *ngIf="showEditForm" (click)="cancelEdit()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Edit Instructor</h2>
+          <button class="close-btn" (click)="cancelEdit()">&times;</button>
+        </div>
+        <form (ngSubmit)="updateInstructor()">
+          <div class="form-group">
+            <label for="editFirstName">First Name</label>
+            <input type="text" id="editFirstName" [(ngModel)]="selectedInstructor.firstName" name="firstName" required>
+          </div>
+          <div class="form-group">
+            <label for="editLastName">Last Name</label>
+            <input type="text" id="editLastName" [(ngModel)]="selectedInstructor.lastName" name="lastName" required>
+          </div>
+          <div class="form-group">
+            <label for="editEmail">Email</label>
+            <input type="email" id="editEmail" [(ngModel)]="selectedInstructor.email" name="email" required>
+          </div>
+          <div class="form-group">
+            <label>
+              <input type="checkbox" [(ngModel)]="selectedInstructor.isEnabled" name="isEnabled">
+              Active Account
+            </label>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" (click)="cancelEdit()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Update Instructor</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </app-page-shell>
+</app-dashboard-layout>

@@ -1,0 +1,118 @@
+<app-dashboard-layout [appTitle]="'VirtuBuild'">
+  <app-page-shell title="Admin" subtitle="System overview and management">
+  <div class="admin-dashboard">
+    <div class="dashboard-content" *ngIf="!loading">
+    <div class="stats-container">
+      <div class="stats-grid">
+      <div class="stat-card">
+        <div class="card-header">
+          <div class="card-icon users-icon">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="currentColor"/>
+              <path d="M12 14C7.58172 14 4 17.5817 4 22H20C20 17.5817 16.4183 14 12 14Z" fill="currentColor"/>
+            </svg>
+          </div>
+          <div class="card-menu">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="2" fill="#7f8c8d"/>
+              <circle cx="12" cy="5" r="2" fill="#7f8c8d"/>
+              <circle cx="12" cy="19" r="2" fill="#7f8c8d"/>
+            </svg>
+          </div>
+        </div>
+        <div class="card-title">Total Users</div>
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="getProgressPercentage(dashboardStats.totalUsers, 50)"></div>
+        </div>
+        <div class="card-stats">
+          <span class="stat-number">{{ dashboardStats.totalUsers || 0 }}</span>
+          <span class="stat-label">Users</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="card-header">
+          <div class="card-icon modules-icon">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" fill="currentColor"/>
+            </svg>
+          </div>
+          <div class="card-menu">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="2" fill="#7f8c8d"/>
+              <circle cx="12" cy="5" r="2" fill="#7f8c8d"/>
+              <circle cx="12" cy="19" r="2" fill="#7f8c8d"/>
+            </svg>
+          </div>
+        </div>
+        <div class="card-title">Learning Modules</div>
+        <div class="progress-bar">
+          <div class="progress-fill modules-progress" [style.width.%]="getProgressPercentage(dashboardStats.totalModules, 20)"></div>
+        </div>
+        <div class="card-stats">
+          <span class="stat-number">{{ dashboardStats.totalModules || 0 }}</span>
+          <span class="stat-label">Modules</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="card-header">
+          <div class="card-icon activities-icon">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V5H19V19M17,12H7V10H17V12M15,16H7V14H15V16M17,8H7V6H17V8Z" fill="currentColor"/>
+            </svg>
+          </div>
+          <div class="card-menu">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="2" fill="#7f8c8d"/>
+              <circle cx="12" cy="5" r="2" fill="#7f8c8d"/>
+              <circle cx="12" cy="19" r="2" fill="#7f8c8d"/>
+            </svg>
+          </div>
+        </div>
+        <div class="card-title">Lab Activities</div>
+        <div class="progress-bar">
+          <div class="progress-fill activities-progress" [style.width.%]="getProgressPercentage(dashboardStats.totalActivities, 30)"></div>
+        </div>
+        <div class="card-stats">
+          <span class="stat-number">{{ dashboardStats.totalActivities || 0 }}</span>
+          <span class="stat-label">Activities</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="card-header">
+          <div class="card-icon grades-icon">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12,2L15.09,8.26L22,9L17,14L18.18,21L12,17.77L5.82,21L7,14L2,9L8.91,8.26L12,2Z" fill="currentColor"/>
+            </svg>
+          </div>
+          <div class="card-menu">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="2" fill="#7f8c8d"/>
+              <circle cx="12" cy="5" r="2" fill="#7f8c8d"/>
+              <circle cx="12" cy="19" r="2" fill="#7f8c8d"/>
+            </svg>
+          </div>
+        </div>
+        <div class="card-title">Average Grade</div>
+        <div class="progress-bar">
+          <div class="progress-fill grades-progress" [style.width.%]="dashboardStats.averageGrade || 0"></div>
+        </div>
+        <div class="card-stats">
+          <span class="stat-number">{{ (dashboardStats.averageGrade || 0) | number:'1.1-1' }}%</span>
+          <span class="stat-label">Grade</span>
+        </div>
+      </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Loading dashboard...</p>
+  </div>
+  </div>
+  </app-page-shell>
+</app-dashboard-layout>

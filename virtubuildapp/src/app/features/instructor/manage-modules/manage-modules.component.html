@@ -1,0 +1,19 @@
+<app-dashboard-layout [appTitle]="'VirtuBuild'">
+  <app-page-shell title="Manage Modules" subtitle="Create, activate and manage modules">
+  <div *ngFor="let m of modules" class="module-card">
+    <h3>{{ m.title }}</h3>
+    <div>
+      <input #groupInput placeholder="Group name" />
+      <button (click)="activate(m.id, groupInput.value)">Activate</button>
+    </div>
+    <div>
+      <h4>Active Groups</h4>
+      <ul>
+        <li *ngFor="let a of activations[m.id]">{{ a.groupName }} <button (click)="deactivate(m.id, a.groupName)">Deactivate</button></li>
+      </ul>
+    </div>
+  </div>
+  </app-page-shell>
+</app-dashboard-layout>
+
+

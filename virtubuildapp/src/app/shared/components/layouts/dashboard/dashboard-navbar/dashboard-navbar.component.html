@@ -1,0 +1,26 @@
+<header class="navbar">
+  <div class="navbar-left">
+    <button class="menu-toggle" (click)="onToggleSidebar()">
+      <fa-icon [icon]="faBars"></fa-icon>
+    </button>
+  </div>
+  <div class="navbar-right">
+    <div class="user-profile">
+      @if (userProfile?.avatar) {
+      <img
+        [src]="userProfile?.avatar"
+        [alt]="userProfile?.name"
+        class="avatar"
+      />
+      }
+      <div class="user-meta">
+        <span class="user-name">{{ userProfile?.name || "Guest" }}</span>
+        <span class="user-email" *ngIf="userProfile?.email">{{ userProfile?.email }}</span>
+      </div>
+      <button class="logout-button" (click)="onLogout()">
+        <fa-icon [icon]="faSignOutAlt"></fa-icon>
+        Logout
+      </button>
+    </div>
+  </div>
+  </header>

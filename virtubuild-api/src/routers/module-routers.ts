@@ -1,0 +1,15 @@
+export { SystemRouter } from "@/modules/system/system.router";
+export { AuthRouter } from "@/modules/auth/auth.router";
+export { UsersRouter } from "@/modules/users/users.router";
+export { UserRolesRouter } from "@/modules/user-roles/user-roles.router";
+export { ModulesRouter } from "@/modules/modules/modules.router";
+export { ActivitiesRouter } from "@/modules/activities/activities.router";
+export { AssessmentsRouter } from "@/modules/assessments/assessments.router";
+export { GradesRouter } from "@/modules/grades/grades.router";
+export { AnalyticsRouter } from "@/modules/analytics/analytics.router";
+export { ActivationsRouter } from "@/modules/activations/activations.router";
+export { AdminRouter } from "@/modules/admin/admin.router";
+export { StudentGroupsRouter } from "@/modules/student-groups/student-groups.router";
+export { StudentProgressRouter } from "@/modules/student-progress/student-progress.router";
+export { SimulationsRouter } from "@/modules/simulations/simulations.router";
+export { AssessmentSubmissionsRouter } from "@/modules/assessment-submissions/assessment-submissions.router";

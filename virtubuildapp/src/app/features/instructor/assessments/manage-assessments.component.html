@@ -1,0 +1,92 @@
+<app-dashboard-layout [appTitle]="appTitle">
+  <app-page-shell title="Manage Assessments" subtitle="View and manage assessments">
+    <div class="content">
+      <div class="table-controls">
+        <div class="search-section">
+          <div class="search-box">
+            <input class="search-input" type="text" placeholder="Search by title, description or activity" [(ngModel)]="searchTerm" (input)="onSearchChange()">
+            <span class="search-icon">🔍</span>
+          </div>
+        </div>
+        <div class="table-info">
+          <div class="items-per-page">
+            <label>Show:</label>
+            <select [(ngModel)]="itemsPerPage" (change)="onItemsPerPageChange(itemsPerPage)" class="page-select">
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+            </select>
+          </div>
+          <button class="btn btn-secondary" (click)="loadAssessments()" [disabled]="loading">Refresh</button>
+        </div>
+      </div>
+
+      <div class="instructors-table">
+        <table *ngIf="filteredAssessments.length > 0">
+          <thead>
+            <tr>
+              <th (click)="sort('title')" class="sortable">Title <span class="sort-indicator" *ngIf="sortField === 'title'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span></th>
+              <th>Description</th>
+              <th>Activity</th>
+              <th (click)="sort('timeLimit')" class="sortable">Time Limit <span class="sort-indicator" *ngIf="sortField === 'timeLimit'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span></th>
+              <th (click)="sort('passingScore')" class="sortable">Pass % <span class="sort-indicator" *ngIf="sortField === 'passingScore'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span></th>
+              <th>Questions</th>
+              <th (click)="sort('isEnabled')" class="sortable">Status <span class="sort-indicator" *ngIf="sortField === 'isEnabled'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span></th>
+              <th (click)="sort('createdAt')" class="sortable">Created <span class="sort-indicator" *ngIf="sortField === 'createdAt'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span></th>
+              <th class="actions-header">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let a of paginatedAssessments">
+              <td>{{ a.title }}</td>
+              <td class="description-cell">{{ a.description || '-' }}</td>
+              <td>{{ getActivityTitle(a.labActivityId) }}</td>
+              <td>{{ (a.timeLimit ?? a.timeLimitMinutes) ?? '-' }}<span *ngIf="a.timeLimit || a.timeLimitMinutes"> m</span></td>
+              <td>{{ a.passingScore ?? '-' }}</td>
+              <td>{{ a.questions?.length ?? 0 }}</td>
+              <td>
+                <span class="status-badge" [class]="a.isEnabled ? 'active' : 'inactive'">
+                  <span class="status-dot"></span>
+                  {{ a.isEnabled ? 'Active' : 'Inactive' }}
+                </span>
+              </td>
+              <td>{{ a.createdAt | date:'medium' }}</td>
+              <td>
+                <div class="action-buttons">
+                  <a class="btn btn-sm btn-primary" title="Edit Assessment" [routerLink]="['/instructor/assessments', a.labActivityId]">
+                    <span class="material-icons">edit</span>
+                    Edit
+                  </a>
+                  <button class="btn btn-sm btn-danger" title="Delete Assessment" (click)="deleteAssessment(a.id)">
+                    <span class="material-icons">delete</span>
+                    Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="empty-state" *ngIf="!loading && filteredAssessments.length === 0">
+          <div class="empty-icon">📝</div>
+          <h3>No assessments found</h3>
+          <p>Assessments from /api/assessments will appear here.</p>
+        </div>
+      </div>
+
+      <div class="pagination" *ngIf="totalPages > 1">
+        <div class="pagination-info">Page {{ currentPage }} of {{ totalPages }}</div>
+        <div class="pagination-controls">
+          <button class="btn btn-sm btn-secondary" (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
+          <div class="page-numbers">
+            <button *ngFor="let page of getPageNumbers()" class="page-btn" [class.active]="page === currentPage" (click)="onPageChange(page)">{{ page }}</button>
+          </div>
+          <button class="btn btn-sm btn-secondary" (click)="onPageChange(currentPage + 1)" [disabled]="currentPage === totalPages">Next</button>
+        </div>
+      </div>
+    </div>
+  </app-page-shell>
+</app-dashboard-layout>
+
+

@@ -1,0 +1,172 @@
+<app-dashboard-layout [appTitle]="appTitle">
+  <app-page-shell title="Manage Activities" subtitle="View and manage lab activities">
+    <div class="manage-activities">
+      <div class="table-controls">
+        <div class="search-section">
+          <div class="search-box">
+            <input type="text" class="search-input" placeholder="Search activities..." [(ngModel)]="searchTerm" (input)="onSearchChange()">
+            <span class="search-icon">🔍</span>
+          </div>
+        </div>
+        <div class="table-info">
+          <div class="items-per-page">
+            <label>Show:</label>
+            <select [(ngModel)]="itemsPerPage" (change)="onItemsPerPageChange(itemsPerPage)" class="page-select">
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+            </select>
+          </div>
+          <button class="refresh-btn" (click)="refreshActivities()" [disabled]="loading">
+            <span class="material-icons">refresh</span>
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      <div class="error-message" *ngIf="error">
+        <span class="material-icons">error</span>
+        {{ error }}
+      </div>
+
+      <div class="loading-spinner" *ngIf="loading">
+        <span class="material-icons">hourglass_empty</span>
+        Loading activities...
+      </div>
+
+      <div class="instructors-table" *ngIf="!loading && !error">
+        <table *ngIf="filteredActivities.length > 0">
+          <thead>
+            <tr>
+              <th (click)="sort('title')" class="sortable">Title
+                <span class="sort-indicator" *ngIf="sortField === 'title'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+              </th>
+              <th (click)="sort('location')" class="sortable">Location
+                <span class="sort-indicator" *ngIf="sortField === 'location'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+              </th>
+              <th>Capacity</th>
+              <th>Tools</th>
+              <th>Components</th>
+              <th>Simulation</th>
+              <th>Workstations</th>
+              <th (click)="sort('isEnabled')" class="sortable">Status
+                <span class="sort-indicator" *ngIf="sortField === 'isEnabled'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+              </th>
+              <th (click)="sort('createdAt')" class="sortable">Created
+                <span class="sort-indicator" *ngIf="sortField === 'createdAt'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+              </th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let activity of paginatedActivities">
+              <td>
+                <div class="title-cell">{{ activity.title }}</div>
+                <div class="description-preview">{{ activity.description }}</div>
+              </td>
+              <td>{{ activity.location || '-' }}</td>
+              <td>{{ activity.capacity || '-' }}</td>
+              <td>
+                <span *ngIf="activity.equipment?.tools?.length; else noTools">{{ activity.equipment.tools.join(', ') }}</span>
+                <ng-template #noTools>-</ng-template>
+              </td>
+              <td>
+                <span *ngIf="activity.equipment?.components?.length; else noComponents">{{ activity.equipment.components.join(', ') }}</span>
+                <ng-template #noComponents>-</ng-template>
+              </td>
+              <td>{{ activity.equipment?.simulation || '-' }}</td>
+              <td>{{ activity.equipment?.workstations ?? '-' }}</td>
+              <td>
+                <span class="activity-status" [class.enabled]="activity.isEnabled" [class.disabled]="!activity.isEnabled">
+                  {{ activity.isEnabled ? 'Enabled' : 'Disabled' }}
+                </span>
+              </td>
+              <td>{{ activity.createdAt | date:'medium' }}</td>
+              <td class="actions-cell">
+                <button class="btn btn-universal" title="View Assessments" (click)="openAssessments(activity)">
+                  <span class="material-icons">quiz</span>
+                  View Assessments
+                </button>
+                <button class="btn btn-universal" title="View Grades" (click)="openGrades(activity)">
+                  <span class="material-icons">grade</span>
+                  Grades
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination" *ngIf="totalPages > 1">
+        <div class="pagination-info">Page {{ currentPage }} of {{ totalPages }}</div>
+        <div class="pagination-controls">
+          <button class="btn btn-sm btn-secondary" (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
+          <div class="page-numbers">
+            <button *ngFor="let page of getPageNumbers()" class="page-btn" [class.active]="page === currentPage" (click)="onPageChange(page)">{{ page }}</button>
+          </div>
+          <button class="btn btn-sm btn-secondary" (click)="onPageChange(currentPage + 1)" [disabled]="currentPage === totalPages">Next</button>
+        </div>
+      </div>
+
+      <div class="no-activities" *ngIf="!loading && !error && filteredActivities.length === 0">
+        <span class="material-icons">assignment</span>
+        <h3>No activities found</h3>
+        <p>No activities are available.</p>
+      </div>
+
+      <div class="modal-overlay" *ngIf="showAssessmentsModal || showGradesModal" (click)="closeModals()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h3 *ngIf="showAssessmentsModal">Assessments for {{ selectedActivity?.title }}</h3>
+            <h3 *ngIf="showGradesModal">Grades for {{ selectedActivity?.title }}</h3>
+            <button class="close-btn" (click)="closeModals()">&times;</button>
+          </div>
+          <div class="modal-body" *ngIf="showAssessmentsModal">
+            <table *ngIf="activityAssessments.length > 0">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Description</th>
+                  <th>Questions</th>
+                  <th>Time</th>
+                  <th>Pass %</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let a of activityAssessments">
+                  <td>{{ a.title }}</td>
+                  <td>{{ a.description || '-' }}</td>
+                  <td>{{ a.questions?.length ?? 0 }}</td>
+                  <td>{{ a.timeLimit ?? a.timeLimitMinutes ?? '-' }}</td>
+                  <td>{{ a.passingScore ?? '-' }}</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="empty-state" *ngIf="activityAssessments.length === 0">No assessments found.</div>
+          </div>
+          <div class="modal-body" *ngIf="showGradesModal">
+            <table *ngIf="activityGrades.length > 0">
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Assessment</th>
+                  <th>Score</th>
+                  <th>Submitted</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let g of activityGrades">
+                  <td>{{ getGradeStudentName(g) }}</td>
+                  <td>{{ getGradeAssessmentTitle(g) }}</td>
+                  <td>{{ g.score ?? g.percentage ?? '-' }}%</td>
+                  <td>{{ g.submittedAt || g.createdAt | date:'medium' }}</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="empty-state" *ngIf="activityGrades.length === 0">No grades found.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </app-page-shell>
+</app-dashboard-layout>

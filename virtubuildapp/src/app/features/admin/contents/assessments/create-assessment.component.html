@@ -1,0 +1,228 @@
+<div class="create-assessment-container">
+  <div class="page-header">
+    <button class="back-btn" (click)="cancel()">
+      <span class="material-icons">arrow_back</span>
+      Back to Assessments
+    </button>
+    <h1>{{ pageTitle }}</h1>
+  </div>
+
+  <form [formGroup]="assessmentForm" (ngSubmit)="onSubmit()" class="assessment-form">
+    <!-- Assessment Basic Info -->
+    <div class="form-section">
+      <h2>Assessment Information</h2>
+      <div class="form-group">
+        <label for="labActivityId">Lab Activity *</label>
+        <select 
+          id="labActivityId" 
+          formControlName="labActivityId"
+          [class.error]="assessmentForm.get('labActivityId')?.invalid && assessmentForm.get('labActivityId')?.touched"
+        >
+          <option value="">Select a lab activity</option>
+          <option *ngFor="let activity of labActivities" [value]="activity.id">
+            {{ activity.title }}
+          </option>
+        </select>
+        <div class="error-message" *ngIf="assessmentForm.get('labActivityId')?.invalid && assessmentForm.get('labActivityId')?.touched">
+          <span *ngIf="assessmentForm.get('labActivityId')?.errors?.['required']">Lab Activity is required</span>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="title">Assessment Title *</label>
+          <input 
+            type="text" 
+            id="title" 
+            formControlName="title"
+            placeholder="Enter assessment title"
+            [class.error]="assessmentForm.get('title')?.invalid && assessmentForm.get('title')?.touched"
+          >
+          <div class="error-message" *ngIf="assessmentForm.get('title')?.invalid && assessmentForm.get('title')?.touched">
+            <span *ngIf="assessmentForm.get('title')?.errors?.['required']">Title is required</span>
+            <span *ngIf="assessmentForm.get('title')?.errors?.['minlength']">Title must be at least 3 characters</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="timeLimitMinutes">Time Limit (minutes) *</label>
+          <input 
+            type="number" 
+            id="timeLimitMinutes" 
+            formControlName="timeLimitMinutes"
+            min="1" 
+            max="180"
+            [class.error]="assessmentForm.get('timeLimitMinutes')?.invalid && assessmentForm.get('timeLimitMinutes')?.touched"
+          >
+          <div class="error-message" *ngIf="assessmentForm.get('timeLimitMinutes')?.invalid && assessmentForm.get('timeLimitMinutes')?.touched">
+            <span *ngIf="assessmentForm.get('timeLimitMinutes')?.errors?.['required']">Time limit is required</span>
+            <span *ngIf="assessmentForm.get('timeLimitMinutes')?.errors?.['min']">Minimum 1 minute</span>
+            <span *ngIf="assessmentForm.get('timeLimitMinutes')?.errors?.['max']">Maximum 180 minutes</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea 
+          id="description" 
+          formControlName="description"
+          placeholder="Enter assessment description"
+          rows="3"
+        ></textarea>
+      </div>
+
+      <div class="form-group checkbox-group">
+        <label>
+          <input type="checkbox" formControlName="isEnabled">
+          <span class="checkmark"></span>
+          Enable this assessment
+        </label>
+      </div>
+    </div>
+
+    <!-- Questions Section -->
+    <div class="form-section">
+      <div class="section-header">
+        <h2>Questions</h2>
+        <button type="button" class="btn btn-primary" (click)="addQuestion()">
+          <span class="material-icons">add</span>
+          Add Question
+        </button>
+      </div>
+
+      <div formArrayName="questions" class="questions-container">
+        <div 
+          *ngFor="let question of questionsArray.controls; let i = index" 
+          [formGroupName]="i"
+          class="question-card"
+        >
+          <div class="question-header">
+            <h3>Question {{ i + 1 }}</h3>
+            <button 
+              type="button" 
+              class="btn btn-danger btn-sm" 
+              (click)="removeQuestion(i)"
+              [disabled]="questionsArray.length === 1"
+            >
+              <span class="material-icons">delete</span>
+              Remove
+            </button>
+          </div>
+
+          <div class="question-content">
+            <div class="form-group">
+              <label>Question Text *</label>
+              <div class="wysiwyg-editor" 
+                   contenteditable="true" 
+                   [innerHTML]="question.get('questionText')?.value"
+                   (input)="onQuestionTextChange(i, $event)"
+                   (blur)="onQuestionTextBlur(i, $event)"
+                   placeholder="Enter your question here...">
+              </div>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Question Type *</label>
+                <select formControlName="questionType" (change)="onQuestionTypeChange(i, $event)">
+                  <option value="multiple_choice">Multiple Choice</option>
+                  <option value="enumeration">Enumeration</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Points *</label>
+                <input 
+                  type="number" 
+                  formControlName="points"
+                  min="1" 
+                  max="100"
+                  [class.error]="question.get('points')?.invalid && question.get('points')?.touched"
+                >
+              </div>
+            </div>
+
+            <!-- Options Section -->
+            <div class="options-section">
+              <div class="options-header">
+                <label>{{ question.get('questionType')?.value === 'multiple_choice' ? 'Answer Options' : 'Enumeration Items' }}</label>
+                <button 
+                  type="button" 
+                  class="btn btn-secondary btn-sm" 
+                  (click)="addOption(i)"
+                >
+                  <span class="material-icons">add</span>
+                  Add {{ question.get('questionType')?.value === 'multiple_choice' ? 'Option' : 'Item' }}
+                </button>
+              </div>
+
+              <div formArrayName="options" class="options-container">
+                <div 
+                  *ngFor="let option of getOptionsArray(question); let j = index" 
+                  [formGroupName]="j"
+                  class="option-item"
+                >
+                  <div class="option-content">
+                    <div class="form-group">
+                      <input 
+                        type="text" 
+                        formControlName="value"
+                        [placeholder]="question.get('questionType')?.value === 'multiple_choice' ? 'Enter option text' : 'Enter enumeration item'"
+                        [class.error]="option.get('value')?.invalid && option.get('value')?.touched"
+                      >
+                    </div>
+
+                    <div class="option-actions" *ngIf="question.get('questionType')?.value === 'multiple_choice'">
+                      <label class="correct-option">
+                        <input 
+                          type="radio" 
+                          [name]="'correctAnswer_' + i"
+                          [value]="j"
+                          (change)="question.get('correctAnswer')?.setValue(j)"
+                          [checked]="question.get('correctAnswer')?.value === j"
+                        >
+                        <span class="radio-mark"></span>
+                        Correct Answer
+                      </label>
+                    </div>
+
+                    <button 
+                      type="button" 
+                      class="btn btn-danger btn-sm remove-btn"
+                      (click)="removeOption(i, j)"
+                      [disabled]="getOptionsArray(question).length <= 2"
+                    >
+                      <span class="material-icons">delete</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Explanation -->
+            <div class="form-group">
+              <label>Explanation (Optional)</label>
+              <textarea 
+                formControlName="explanation"
+                placeholder="Provide explanation for the correct answer"
+                rows="2"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="cancel()">
+        Cancel
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="loading || !assessmentForm.valid">
+        <span *ngIf="loading" class="spinner"></span>
+        {{ loading ? (isEditMode ? 'Updating...' : 'Creating...') : (isEditMode ? 'Update Assessment' : 'Create Assessment') }}
+      </button>
+    </div>
+  </form>
+</div>

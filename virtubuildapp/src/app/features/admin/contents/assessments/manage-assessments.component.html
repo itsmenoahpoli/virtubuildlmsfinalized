@@ -1,0 +1,304 @@
+<div class="assessments-container">
+    <div class="page-header">
+      <h1>Assessment Management</h1>
+      <button class="btn btn-primary" [routerLink]="['/admin/contents/assessments/create']">
+        Create New Assessment
+      </button>
+    </div>
+
+    <div class="content" *ngIf="!loading">
+      <div class="assessments-grid">
+        <div class="assessment-card" *ngFor="let assessment of assessments">
+          <div class="assessment-header">
+            <h3>{{ assessment.title }}</h3>
+            <div class="assessment-actions">
+              <button class="btn btn-sm btn-secondary" (click)="viewAssessment(assessment)">
+                View
+              </button>
+              <button class="btn btn-sm btn-secondary" (click)="editAssessment(assessment)">
+                Edit
+              </button>
+              <button 
+                class="btn btn-sm btn-danger" 
+                [class.disabled]="assessment.hasSubmissions"
+                [disabled]="assessment.hasSubmissions"
+                (click)="deleteAssessment(assessment)"
+                [title]="assessment.hasSubmissions ? 'Cannot delete assessment with student submissions' : 'Delete assessment'"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+          <div class="assessment-content">
+            <p class="assessment-description">{{ assessment.description }}</p>
+            <div class="assessment-stats">
+              <span class="stat">
+                <span class="stat-label">Status:</span>
+                <span class="status-badge" [class]="assessment.isEnabled ? 'active' : 'inactive'">
+                  {{ assessment.isEnabled ? 'Active' : 'Inactive' }}
+                </span>
+              </span>
+              <span class="stat">
+                <span class="stat-label">Submissions:</span>
+                <span class="submission-count" [class.has-submissions]="assessment.hasSubmissions">
+                  {{ assessment.submissionCount || 0 }}
+                </span>
+              </span>
+            </div>
+            
+            <!-- Recent Submissions Preview -->
+            <div class="recent-submissions" *ngIf="assessment.hasSubmissions && assessment.recentSubmissions?.length > 0">
+              <h4>Recent Submissions</h4>
+              <div class="submissions-preview">
+                <div class="submission-item" *ngFor="let submission of assessment.recentSubmissions.slice(0, 2)">
+                  <div class="submission-info">
+                    <span class="student-name">{{ submission.student?.firstName }} {{ submission.student?.lastName }}</span>
+                    <span class="submission-date">{{ submission.submittedAt | date:'short' }}</span>
+                  </div>
+                  <span class="score-badge" [class]="getScoreClass(submission.score)">
+                    {{ submission.score }}%
+                  </span>
+                </div>
+              </div>
+              <div class="view-all-submissions" *ngIf="assessment.submissionCount > 2">
+                <button class="btn btn-sm btn-link" (click)="viewAssessment(assessment)">
+                  View all {{ assessment.submissionCount }} submissions
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- View Assessment Modal -->
+    <div class="modal-overlay" *ngIf="showViewModal && selectedAssessment">
+      <div class="modal-content view-modal">
+        <div class="modal-header">
+          <h2>{{ selectedAssessment.title }}</h2>
+          <button class="close-btn" (click)="closeViewModal()">×</button>
+        </div>
+        
+        <div class="modal-body">
+          <!-- Assessment Details -->
+          <div class="assessment-details">
+            <h3>Assessment Details</h3>
+            <div class="details-grid">
+              <div class="detail-item">
+                <label>Description:</label>
+                <p>{{ selectedAssessment.description || 'No description provided' }}</p>
+              </div>
+              <div class="detail-item">
+                <label>Time Limit:</label>
+                <p>{{ selectedAssessment.timeLimitMinutes || 30 }} minutes</p>
+              </div>
+              <div class="detail-item">
+                <label>Status:</label>
+                <span class="status-badge" [class]="selectedAssessment.isEnabled ? 'active' : 'inactive'">
+                  {{ selectedAssessment.isEnabled ? 'Active' : 'Inactive' }}
+                </span>
+              </div>
+              <div class="detail-item">
+                <label>Created:</label>
+                <p>{{ selectedAssessment.createdAt | date:'medium' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submissions Section -->
+          <div class="submissions-section">
+            <div class="section-header">
+              <h3>Student Submissions</h3>
+              <button class="btn btn-sm btn-secondary" (click)="refreshSubmissions()">
+                Refresh
+              </button>
+            </div>
+            
+            <div class="submissions-list" *ngIf="assessmentSubmissions.length > 0; else noSubmissions">
+              <div class="submission-item" *ngFor="let submission of assessmentSubmissions">
+                <div class="submission-header">
+                  <div class="student-info">
+                    <h4>{{ submission.student?.firstName }} {{ submission.student?.lastName }}</h4>
+                    <p class="student-email">{{ submission.student?.email }}</p>
+                  </div>
+                  <div class="submission-score">
+                    <span class="score-badge" [class]="getScoreClass(submission.score)">
+                      {{ submission.score }}%
+                    </span>
+                  </div>
+                </div>
+                <div class="submission-details">
+                  <div class="detail-row">
+                    <span class="label">Submitted:</span>
+                    <span>{{ submission.submittedAt | date:'medium' }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="label">Time Spent:</span>
+                    <span>{{ formatTimeSpent(submission.timeSpentSeconds) }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="label">Status:</span>
+                    <span class="status-badge" [class]="submission.isSubmitted ? 'active' : 'inactive'">
+                      {{ submission.isSubmitted ? 'Completed' : 'In Progress' }}
+                    </span>
+                  </div>
+                </div>
+                <div class="submission-actions">
+                  <button class="btn btn-sm btn-secondary" (click)="viewSubmissionDetails(submission)">
+                    View Details
+                  </button>
+                  <button class="btn btn-sm btn-secondary" (click)="provideFeedback(submission)">
+                    Feedback
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <ng-template #noSubmissions>
+              <div class="no-submissions">
+                <div class="no-submissions-icon">📝</div>
+                <h4>No submissions yet</h4>
+                <p>Students haven't submitted this assessment yet.</p>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submission Details Modal -->
+    <div class="modal-overlay" *ngIf="showSubmissionDetailsModal && selectedSubmission">
+      <div class="modal-content submission-details-modal">
+        <div class="modal-header">
+          <h2>Submission Details</h2>
+          <button class="close-btn" (click)="closeSubmissionDetailsModal()">×</button>
+        </div>
+        
+        <div class="modal-body">
+          <!-- Student Information -->
+          <div class="student-section">
+            <h3>Student Information</h3>
+            <div class="student-info-grid">
+              <div class="info-item">
+                <label>Name:</label>
+                <span>{{ selectedSubmission.student?.firstName }} {{ selectedSubmission.student?.lastName }}</span>
+              </div>
+              <div class="info-item">
+                <label>Email:</label>
+                <span>{{ selectedSubmission.student?.email }}</span>
+              </div>
+              <div class="info-item">
+                <label>Submitted:</label>
+                <span>{{ selectedSubmission.submittedAt | date:'medium' }}</span>
+              </div>
+              <div class="info-item">
+                <label>Time Spent:</label>
+                <span>{{ formatTimeSpent(selectedSubmission.timeSpentSeconds) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submission Summary -->
+          <div class="submission-summary">
+            <h3>Submission Summary</h3>
+            <div class="summary-grid">
+              <div class="summary-item">
+                <label>Score:</label>
+                <span class="score-badge" [class]="getScoreClass(selectedSubmission.score)">
+                  {{ selectedSubmission.score }}%
+                </span>
+              </div>
+              <div class="summary-item">
+                <label>Status:</label>
+                <span class="status-badge" [class]="selectedSubmission.isSubmitted ? 'completed' : 'in-progress'">
+                  {{ selectedSubmission.isSubmitted ? 'Completed' : 'In Progress' }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Assessment Questions and Answers -->
+          <div class="questions-section" *ngIf="selectedSubmission.answers">
+            <h3>Questions & Answers</h3>
+            <div class="questions-list">
+              <div class="question-item" *ngFor="let answer of getAnswersArray(selectedSubmission); let i = index">
+                <div class="question-header">
+                  <h4>Question {{ i + 1 }}</h4>
+                  <span class="question-points" *ngIf="answer.points">({{ answer.points }} points)</span>
+                </div>
+                <div class="question-content">
+                  <p class="question-text">{{ answer.question }}</p>
+                  
+                  <!-- Multiple Choice Answers -->
+                  <div class="answer-options" *ngIf="answer.type === 'multiple_choice'">
+                    <div class="option" 
+                         *ngFor="let option of answer.options; let j = index"
+                         [class.selected]="answer.selectedAnswer === j"
+                         [class.correct]="answer.correctAnswer === j"
+                         [class.incorrect]="answer.selectedAnswer === j && answer.correctAnswer !== j">
+                      <span class="option-label">{{ getOptionLabel(j) }}.</span>
+                      <span class="option-text">{{ option }}</span>
+                      <span class="option-status">
+                        <span *ngIf="answer.correctAnswer === j" class="correct-indicator">✓</span>
+                        <span *ngIf="answer.selectedAnswer === j && answer.correctAnswer !== j" class="incorrect-indicator">✗</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Text/Short Answer -->
+                  <div class="text-answer" *ngIf="answer.type === 'text' || answer.type === 'short_answer'">
+                    <div class="answer-field">
+                      <label>Student's Answer:</label>
+                      <div class="answer-content">{{ answer.studentAnswer || 'No answer provided' }}</div>
+                    </div>
+                    <div class="answer-field" *ngIf="answer.correctAnswer">
+                      <label>Expected Answer:</label>
+                      <div class="answer-content">{{ answer.correctAnswer }}</div>
+                    </div>
+                  </div>
+
+                  <!-- True/False -->
+                  <div class="boolean-answer" *ngIf="answer.type === 'true_false'">
+                    <div class="answer-options">
+                      <div class="option" 
+                           [class.selected]="answer.selectedAnswer === true"
+                           [class.correct]="answer.correctAnswer === true"
+                           [class.incorrect]="answer.selectedAnswer === true && answer.correctAnswer !== true">
+                        <span class="option-text">True</span>
+                        <span class="option-status">
+                          <span *ngIf="answer.correctAnswer === true" class="correct-indicator">✓</span>
+                          <span *ngIf="answer.selectedAnswer === true && answer.correctAnswer !== true" class="incorrect-indicator">✗</span>
+                        </span>
+                      </div>
+                      <div class="option" 
+                           [class.selected]="answer.selectedAnswer === false"
+                           [class.correct]="answer.correctAnswer === false"
+                           [class.incorrect]="answer.selectedAnswer === false && answer.correctAnswer !== false">
+                        <span class="option-text">False</span>
+                        <span class="option-status">
+                          <span *ngIf="answer.correctAnswer === false" class="correct-indicator">✓</span>
+                          <span *ngIf="answer.selectedAnswer === false && answer.correctAnswer !== false" class="incorrect-indicator">✗</span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Feedback Section -->
+          <div class="feedback-section" *ngIf="selectedSubmission.feedback">
+            <h3>Feedback</h3>
+            <div class="feedback-content">
+              <p>{{ selectedSubmission.feedback.comment || 'No feedback provided' }}</p>
+              <div class="feedback-meta" *ngIf="selectedSubmission.feedback.givenAt">
+                <small>Given on: {{ selectedSubmission.feedback.givenAt | date:'medium' }}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+</div>

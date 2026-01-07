@@ -1,0 +1,11 @@
+<div>
+  <h2>{{ activity?.title }}</h2>
+  <p>{{ activity?.description }}</p>
+  <div>
+    <h3>Progress</h3>
+    <div>Points: {{ activity?.gamification?.points }}</div>
+    <div>Badges: {{ activity?.gamification?.badges?.join(', ') }}</div>
+  </div>
+</div>
+
+

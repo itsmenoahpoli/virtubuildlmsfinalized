@@ -1,0 +1,108 @@
+.page-header {
+  margin-bottom: 3rem;
+
+  h1 {
+    color: #2c3e50;
+    margin: 0 0 0.5rem 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+  }
+
+  p {
+    color: #7f8c8d;
+    font-size: 1.1rem;
+    margin: 0;
+  }
+}
+
+.content-categories {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.category-card {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  text-decoration: none;
+  color: inherit;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  }
+
+  .category-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    .material-icons {
+      font-size: 28px;
+      color: white;
+    }
+  }
+
+  .category-info {
+    flex: 1;
+
+    h3 {
+      margin: 0 0 0.5rem 0;
+      color: #2c3e50;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 0;
+      color: #7f8c8d;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+  }
+
+  .category-arrow {
+    .material-icons {
+      color: #bdc3c7;
+      font-size: 20px;
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .content-categories {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .category-card {
+    padding: 1.5rem;
+    gap: 1rem;
+
+    .category-icon {
+      width: 50px;
+      height: 50px;
+
+      .material-icons {
+        font-size: 24px;
+      }
+    }
+
+    .category-info h3 {
+      font-size: 1.25rem;
+    }
+  }
+}

@@ -1,0 +1,89 @@
+<app-dashboard-layout [appTitle]="'VirtuBuild'">
+<app-page-shell title="Grades" subtitle="Manage grades and overrides">
+  <div class="page-header">
+    <h1>Grades</h1>
+    <button class="btn btn-primary" (click)="createGrade()">
+      <span class="btn-icon">➕</span>
+      Add Grade
+    </button>
+  </div>
+
+  <div class="content" *ngIf="!loading">
+    <div class="grades-table">
+      <table>
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Activity</th>
+            <th>Score</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let g of grades">
+            <td>{{ g.userId }}</td>
+            <td>{{ g.activityId }}</td>
+            <td>{{ g.score }}</td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn btn-sm btn-secondary" (click)="editGrade(g)">Edit</button>
+                <button class="btn btn-sm btn-danger" (click)="deleteGrade(g.id)">Delete</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal-overlay" *ngIf="showCreateForm" (click)="cancelCreate($event)">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2>Create Grade</h2>
+      <form (ngSubmit)="submitCreate($event)">
+        <label>
+          <span>User ID</span>
+          <input [(ngModel)]="newGrade.userId" name="userId" required />
+        </label>
+        <label>
+          <span>Activity ID</span>
+          <input [(ngModel)]="newGrade.activityId" name="activityId" required />
+        </label>
+        <label>
+          <span>Score</span>
+          <input [(ngModel)]="newGrade.score" name="score" required />
+        </label>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="cancelCreate($event)">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay" *ngIf="showEditForm" (click)="cancelEdit($event)">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2>Edit Grade</h2>
+      <form (ngSubmit)="submitEdit($event)">
+        <label>
+          <span>User ID</span>
+          <input [(ngModel)]="selectedGrade.userId" name="edit_userId" required />
+        </label>
+        <label>
+          <span>Activity ID</span>
+          <input [(ngModel)]="selectedGrade.activityId" name="edit_activityId" required />
+        </label>
+        <label>
+          <span>Score</span>
+          <input [(ngModel)]="selectedGrade.score" name="edit_score" required />
+        </label>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="cancelEdit($event)">Cancel</button>
+          <button type="submit" class="btn btn-primary">Update</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</app-page-shell>
+</app-dashboard-layout>
+
+

@@ -1,0 +1,123 @@
+<app-dashboard-layout [appTitle]="'VirtuBuild'">
+<app-page-shell title="Student Groups" subtitle="Manage student groups and assignments">
+  <div class="page-header">
+    <h1>Student Groups Management</h1>
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="showAssignForm = true">
+        <span class="btn-icon">👥</span>
+        Assign Student
+      </button>
+      <button class="btn btn-primary" (click)="showCreateForm = true">
+        <span class="btn-icon">➕</span>
+        Create Group
+      </button>
+    </div>
+  </div>
+
+  <div class="content" *ngIf="!loading">
+    <div class="groups-grid">
+      <div class="group-card" *ngFor="let group of groups">
+        <div class="group-header">
+          <h3>{{ group.name }}</h3>
+          <div class="group-actions">
+            <button class="btn btn-sm btn-secondary" (click)="updateGroup(group)">
+              Edit
+            </button>
+            <button class="btn btn-sm btn-danger" (click)="deleteGroup(group.id)">
+              Delete
+            </button>
+          </div>
+        </div>
+        <div class="group-content">
+          <p class="group-description">{{ group.description || 'No description' }}</p>
+          <div class="group-stats">
+            <span class="stat">
+              <span class="stat-label">Students:</span>
+              <span class="stat-value">{{ group.studentCount || 0 }}</span>
+            </span>
+            <span class="stat">
+              <span class="stat-label">Status:</span>
+              <span class="status-badge" [class]="group.isActive ? 'active' : 'inactive'">
+                {{ group.isActive ? 'Active' : 'Inactive' }}
+              </span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Group Modal -->
+  <div class="modal-overlay" *ngIf="showCreateForm" (click)="cancelCreate()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Create New Group</h2>
+        <button class="close-btn" (click)="cancelCreate()">×</button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="createGroup()">
+          <div class="form-group">
+            <label for="groupName">Group Name</label>
+            <input type="text" id="groupName" [(ngModel)]="newGroup.name" name="name" required>
+          </div>
+          <div class="form-group">
+            <label for="groupDescription">Description</label>
+            <textarea id="groupDescription" [(ngModel)]="newGroup.description" name="description" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label>
+              <input type="checkbox" [(ngModel)]="newGroup.isActive" name="isActive">
+              Active Group
+            </label>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" (click)="cancelCreate()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Create Group</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assign Student Modal -->
+  <div class="modal-overlay" *ngIf="showAssignForm" (click)="cancelAssign()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Assign Student to Group</h2>
+        <button class="close-btn" (click)="cancelAssign()">×</button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="assignStudent()">
+          <div class="form-group">
+            <label for="selectGroup">Select Group</label>
+            <select id="selectGroup" [(ngModel)]="assignmentData.groupId" name="groupId" required>
+              <option value="">Choose a group</option>
+              <option *ngFor="let group of groups" [value]="group.id">
+                {{ group.name }}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="selectStudent">Select Student</label>
+            <select id="selectStudent" [(ngModel)]="assignmentData.studentId" name="studentId" required>
+              <option value="">Choose a student</option>
+              <option *ngFor="let student of students" [value]="student.id">
+                {{ student.firstName }} {{ student.lastName }} ({{ student.email }})
+              </option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" (click)="cancelAssign()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Assign Student</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Loading groups...</p>
+  </div>
+</app-page-shell>
+</app-dashboard-layout>

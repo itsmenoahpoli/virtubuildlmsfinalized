@@ -1,0 +1,121 @@
+<div class="pc-assembly-simulation">
+  <div class="simulation-header">
+    <h1>PC Assembly Simulation</h1>
+    <div class="simulation-stats" *ngIf="simulation">
+      <div class="stat">
+        <span class="stat-label">Progress:</span>
+        <span class="stat-value">{{ currentStep }}/{{ totalSteps }}</span>
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="getProgressPercentage()"></div>
+        </div>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Score:</span>
+        <span class="stat-value">{{ score }}</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Time:</span>
+        <span class="stat-value">{{ timeSpent }}s</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Errors:</span>
+        <span class="stat-value">{{ errors }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="simulation-content" *ngIf="!loading">
+    <!-- Start Simulation Section -->
+    <div class="start-section" *ngIf="!simulationStarted">
+      <div class="start-card">
+        <h2>Ready to Start?</h2>
+        <p>This simulation will test your PC assembly skills. You'll need to place components in the correct positions.</p>
+        <div class="components-preview">
+          <h3>Components to Assemble:</h3>
+          <div class="components-list">
+            <div class="component-item" *ngFor="let component of components">
+              <span class="component-icon">🔧</span>
+              <span class="component-name">{{ component.name }}</span>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-large" (click)="startSimulation()">
+          <span class="btn-icon">🚀</span>
+          Start Simulation
+        </button>
+      </div>
+    </div>
+
+    <!-- Simulation Interface -->
+    <div class="simulation-interface" *ngIf="simulationStarted && simulation">
+      <div class="simulation-area">
+        <div class="pc-case">
+          <h3>PC Case</h3>
+          <div class="case-slots">
+            <div class="slot" 
+                 *ngFor="let slot of components" 
+                 [class.occupied]="slot.placed"
+                 (click)="placeComponent(slot, { x: 0, y: 0 })">
+              <span class="slot-label">{{ slot.name }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="components-panel">
+        <h3>Available Components</h3>
+        <div class="components-grid">
+          <div class="component-card" 
+               *ngFor="let component of components" 
+               [class.used]="component.placed"
+               (click)="placeComponent(component, { x: 0, y: 0 })">
+            <div class="component-icon">🔧</div>
+            <div class="component-info">
+              <h4>{{ component.name }}</h4>
+              <p>{{ component.description }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Completion Screen -->
+    <div class="completion-screen" *ngIf="simulation && simulation.status === 'completed'">
+      <div class="completion-card">
+        <div class="completion-icon">🎉</div>
+        <h2>Simulation Complete!</h2>
+        <div class="completion-stats">
+          <div class="stat-item">
+            <span class="stat-label">Final Score:</span>
+            <span class="stat-value score">{{ score }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Time Taken:</span>
+            <span class="stat-value">{{ timeSpent }}s</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Errors:</span>
+            <span class="stat-value">{{ errors }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Accuracy:</span>
+            <span class="stat-value">{{ totalSteps > 0 ? ((totalSteps - errors) / totalSteps * 100).toFixed(1) : 0 }}%</span>
+          </div>
+        </div>
+        <div class="completion-actions">
+          <button class="btn btn-secondary" (click)="resetSimulation()">
+            Try Again
+          </button>
+          <button class="btn btn-primary" routerLink="/student/activities">
+            Back to Activities
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Loading simulation...</p>
+  </div>
+</div>

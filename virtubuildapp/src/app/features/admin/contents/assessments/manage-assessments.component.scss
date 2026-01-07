@@ -1,0 +1,561 @@
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e9ecef;
+
+  h1 {
+    color: #2c3e50;
+    margin: 0;
+    font-size: 2rem;
+  }
+
+  .btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+
+    &.btn-primary {
+      background: #2ecc71;
+      color: white;
+
+      &:hover {
+        background: #27ae60;
+        transform: translateY(-1px);
+      }
+    }
+
+    &.btn-secondary {
+      background: #95a5a6;
+      color: white;
+
+      &:hover {
+        background: #7f8c8d;
+      }
+    }
+
+    &.btn-danger {
+      background: #e74c3c;
+      color: white;
+
+      &:hover {
+        background: #c0392b;
+      }
+    }
+
+    &.btn-sm {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+    }
+  }
+}
+
+.content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+}
+
+.assessments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.assessment-card {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #e9ecef;
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .assessment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+
+    h3 {
+      margin: 0;
+      color: #2c3e50;
+      font-size: 1.25rem;
+      font-weight: 600;
+      flex: 1;
+    }
+
+    .assessment-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-shrink: 0;
+
+      .btn {
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+        padding: 0.5rem 0.875rem;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        min-width: 70px;
+        justify-content: center;
+
+        &.btn-sm {
+          padding: 0.375rem 0.75rem;
+          font-size: 0.8rem;
+          min-width: 60px;
+        }
+
+        &.btn-secondary {
+          background: #f8f9fa;
+          color: #495057;
+          border: 1px solid #dee2e6;
+
+          &:hover {
+            background: #e9ecef;
+            border-color: #adb5bd;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          }
+        }
+
+        &.btn-danger {
+          background: #fff5f5;
+          color: #e53e3e;
+          border: 1px solid #fed7d7;
+
+          &:hover {
+            background: #fed7d7;
+            border-color: #feb2b2;
+            color: #c53030;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(229, 62, 62, 0.2);
+          }
+
+          &.disabled {
+            background: #f8f9fa;
+            color: #adb5bd;
+            border: 1px solid #dee2e6;
+            cursor: not-allowed;
+            opacity: 0.6;
+
+            &:hover {
+              background: #f8f9fa;
+              border-color: #dee2e6;
+              color: #adb5bd;
+              transform: none;
+              box-shadow: none;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .assessment-content {
+    .assessment-description {
+      color: #7f8c8d;
+      margin: 0 0 1rem 0;
+      line-height: 1.5;
+    }
+
+    .assessment-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+
+      .stat {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+
+        .stat-label {
+          font-size: 0.875rem;
+          color: #7f8c8d;
+          font-weight: 500;
+        }
+
+        .submission-count {
+          padding: 0.25rem 0.75rem;
+          border-radius: 12px;
+          font-size: 0.875rem;
+          font-weight: 600;
+          background: #e9ecef;
+          color: #6c757d;
+          border: 1px solid #dee2e6;
+          text-align: center;
+          min-width: 30px;
+
+          &.has-submissions {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+          }
+        }
+      }
+    }
+
+    .recent-submissions {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border: 1px solid #e9ecef;
+
+      h4 {
+        margin: 0 0 0.75rem 0;
+        font-size: 0.9rem;
+        color: #495057;
+        font-weight: 600;
+      }
+
+      .submissions-preview {
+        .submission-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0.5rem 0;
+          border-bottom: 1px solid #e9ecef;
+
+          &:last-child {
+            border-bottom: none;
+          }
+
+          .submission-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+
+            .student-name {
+              font-size: 0.85rem;
+              font-weight: 500;
+              color: #2c3e50;
+            }
+
+            .submission-date {
+              font-size: 0.75rem;
+              color: #6c757d;
+            }
+          }
+
+          .score-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-align: center;
+            min-width: 40px;
+
+            &.excellent {
+              background: #d4edda;
+              color: #155724;
+            }
+
+            &.good {
+              background: #d1ecf1;
+              color: #0c5460;
+            }
+
+            &.fair {
+              background: #fff3cd;
+              color: #856404;
+            }
+
+            &.poor {
+              background: #f8d7da;
+              color: #721c24;
+            }
+          }
+        }
+      }
+
+      .view-all-submissions {
+        margin-top: 0.75rem;
+        text-align: center;
+
+        .btn-link {
+          background: none;
+          border: none;
+          color: #007bff;
+          text-decoration: none;
+          font-size: 0.8rem;
+          cursor: pointer;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+  }
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+
+  &.active {
+    background: #d4edda;
+    color: #155724;
+  }
+
+  &.inactive {
+    background: #f8d7da;
+    color: #721c24;
+  }
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  padding: 0;
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+
+  h2 {
+    margin: 0;
+    color: #2c3e50;
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #7f8c8d;
+
+    &:hover {
+      color: #2c3e50;
+    }
+  }
+}
+
+form {
+  padding: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #2c3e50;
+  }
+
+  input, textarea, select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.2s ease;
+
+    &:focus {
+      outline: none;
+      border-color: #2ecc71;
+      box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.1);
+    }
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+
+  input[type="checkbox"] {
+    width: auto;
+    margin-right: 0.5rem;
+  }
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 2rem;
+}
+
+.view-modal {
+  max-width: 900px;
+  width: 95%;
+}
+
+.modal-body {
+  padding: 1.5rem;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.assessment-details, .submissions-section, .student-section, .submission-summary, .questions-section, .feedback-section {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+
+  h3 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+  }
+}
+
+.details-grid, .student-info-grid, .summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.detail-item, .info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  label {
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.875rem;
+  }
+
+  p, span {
+    margin: 0;
+    color: #6c757d;
+    font-size: 0.95rem;
+  }
+}
+
+.submissions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.submission-item {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1.25rem;
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+  }
+}
+
+.score-badge {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 1rem;
+
+  &.excellent {
+    background: #d4edda;
+    color: #155724;
+  }
+
+  &.good {
+    background: #cce5ff;
+    color: #004085;
+  }
+
+  &.average {
+    background: #fff3cd;
+    color: #856404;
+  }
+
+  &.poor {
+    background: #f8d7da;
+    color: #721c24;
+  }
+}
+
+.questions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.question-item {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.answer-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border: 2px solid #dee2e6;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+
+    &.selected {
+      border-color: #007bff;
+      background: #e7f3ff;
+    }
+
+    &.correct {
+      border-color: #28a745;
+      background: #d4edda;
+      color: #155724;
+    }
+
+    &.incorrect {
+      border-color: #dc3545;
+      background: #f8d7da;
+      color: #721c24;
+    }
+  }
+}

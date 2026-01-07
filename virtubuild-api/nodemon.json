@@ -1,0 +1,12 @@
+{
+	"watch": ["src"],
+	"ext": "ts",
+	"ignore": ["src/**/*.test.ts"],
+	"exec": "ts-node -r tsconfig-paths/register ./index",
+	"env": {
+		"NODE_ENV": "development"
+	},
+	"signal": "SIGTERM",
+	"delay": 1000,
+	"restartable": "rs"
+}

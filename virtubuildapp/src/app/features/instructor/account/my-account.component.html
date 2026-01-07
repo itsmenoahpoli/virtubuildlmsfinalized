@@ -1,0 +1,216 @@
+<app-dashboard-layout [appTitle]="appTitle">
+  <app-page-shell title="My Account" subtitle="Manage your account settings and profile">
+    <div class="my-account">
+      <div class="account-content">
+        <div class="profile-section">
+          <div class="section-header">
+            <h3>Profile Information</h3>
+            <p>Update your personal information and contact details</p>
+          </div>
+
+          <div class="error-message" *ngIf="error">
+            <span class="material-icons">error</span>
+            {{ error }}
+          </div>
+
+          <div class="success-message" *ngIf="success">
+            <span class="material-icons">check_circle</span>
+            {{ success }}
+          </div>
+
+          <div class="loading-spinner" *ngIf="loading">
+            <span class="material-icons">hourglass_empty</span>
+            Loading profile...
+          </div>
+
+          <form *ngIf="!loading && user" (ngSubmit)="updateProfile()" #profileFormRef="ngForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="firstName">First Name</label>
+                <input 
+                  type="text" 
+                  id="firstName" 
+                  name="firstName"
+                  [(ngModel)]="profileForm.firstName" 
+                  required 
+                  class="form-control"
+                  placeholder="Enter your first name"
+                  #firstNameInput="ngModel"
+                >
+              </div>
+
+              <div class="form-group">
+                <label for="lastName">Last Name</label>
+                <input 
+                  type="text" 
+                  id="lastName" 
+                  name="lastName"
+                  [(ngModel)]="profileForm.lastName" 
+                  required 
+                  class="form-control"
+                  placeholder="Enter your last name"
+                  #lastNameInput="ngModel"
+                >
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="middleName">Middle Name (Optional)</label>
+              <input 
+                type="text" 
+                id="middleName" 
+                name="middleName"
+                [(ngModel)]="profileForm.middleName" 
+                class="form-control"
+                placeholder="Enter your middle name"
+                  #middleNameInput="ngModel"
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input 
+                type="email" 
+                id="email" 
+                name="email"
+                [(ngModel)]="profileForm.email" 
+                required 
+                class="form-control"
+                placeholder="Enter your email address"
+                  #emailInput="ngModel"
+              >
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary" [disabled]="!profileFormRef.valid || saving">
+                <span class="material-icons">save</span>
+                {{ saving ? 'Saving...' : 'Update Profile' }}
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="account-details-section">
+          <div class="section-header">
+            <h3>Account Details</h3>
+            <p>View your account information and status</p>
+          </div>
+
+          <div class="account-info" *ngIf="user">
+            <div class="info-item">
+              <span class="info-label">User ID:</span>
+              <span class="info-value">{{ user.id }}</span>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">Role:</span>
+              <span class="info-value role-badge">{{ getRoleDisplay() }}</span>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">Account Status:</span>
+              <span class="info-value status-badge" [class.active]="user.isEnabled" [class.inactive]="!user.isEnabled">
+                {{ user.isEnabled ? 'Active' : 'Inactive' }}
+              </span>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">Email Verified:</span>
+              <span class="info-value status-badge" [class.verified]="user.isEmailVerified" [class.unverified]="!user.isEmailVerified">
+                {{ user.isEmailVerified ? 'Verified' : 'Not Verified' }}
+              </span>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">Two-Factor Authentication:</span>
+              <span class="info-value status-badge" [class.enabled]="user.twoFactorEnabled" [class.disabled]="!user.twoFactorEnabled">
+                {{ user.twoFactorEnabled ? 'Enabled' : 'Disabled' }}
+              </span>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">Account Created:</span>
+              <span class="info-value">{{ formatDate(user.createdAt) }}</span>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">Last Updated:</span>
+              <span class="info-value">{{ formatDate(user.updatedAt) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="security-section">
+          <div class="section-header">
+            <h3>Security Settings</h3>
+            <p>Manage your password and security preferences</p>
+          </div>
+
+          <div class="security-actions">
+            <button class="btn btn-secondary" (click)="togglePasswordForm()">
+              <span class="material-icons">lock</span>
+              {{ showPasswordForm ? 'Cancel' : 'Change Password' }}
+            </button>
+          </div>
+
+          <form *ngIf="showPasswordForm" (ngSubmit)="updatePassword()" #passwordFormRef="ngForm" class="password-form">
+            <div class="form-group">
+              <label for="currentPassword">Current Password</label>
+              <input 
+                type="password" 
+                id="currentPassword" 
+                name="currentPassword"
+                [(ngModel)]="passwordForm.currentPassword" 
+                required 
+                class="form-control"
+                placeholder="Enter your current password"
+                  #currentPasswordInput="ngModel"
+              >
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="newPassword">New Password</label>
+                <input 
+                  type="password" 
+                  id="newPassword" 
+                  name="newPassword"
+                  [(ngModel)]="passwordForm.newPassword" 
+                  required 
+                  minlength="6"
+                  class="form-control"
+                  placeholder="Enter new password"
+                  #newPasswordInput="ngModel"
+                >
+              </div>
+
+              <div class="form-group">
+                <label for="confirmPassword">Confirm New Password</label>
+                <input 
+                  type="password" 
+                  id="confirmPassword" 
+                  name="confirmPassword"
+                  [(ngModel)]="passwordForm.confirmPassword" 
+                  required 
+                  class="form-control"
+                  placeholder="Confirm new password"
+                  #confirmPasswordInput="ngModel"
+                >
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary" [disabled]="!passwordFormRef.valid || saving">
+                <span class="material-icons">save</span>
+                {{ saving ? 'Updating...' : 'Update Password' }}
+              </button>
+              <button type="button" class="btn btn-secondary" (click)="togglePasswordForm()">
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </app-page-shell>
+</app-dashboard-layout>

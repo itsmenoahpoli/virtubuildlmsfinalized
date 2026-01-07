@@ -1,0 +1,45 @@
+@use "tailwindcss";
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+// Global styles for action buttons inside data tables
+.action-buttons {
+  display: inline-flex;
+  gap: 0.5rem;
+}
+
+.action-buttons .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  font-size: 0.875rem;
+  line-height: 1;
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.action-buttons .btn .material-icons {
+  font-size: 18px;
+}
+
+.action-buttons .btn:hover { transform: translateY(-1px); }
+
+.action-buttons .btn.btn-primary { background: #e7f1ff !important; color: #0d6efd !important; border-color: #cfe2ff !important; }
+.action-buttons .btn.btn-secondary { background: #f1f3f5 !important; color: #495057 !important; border-color: #e9ecef !important; }
+.action-buttons .btn.btn-danger { background: #fdecea !important; color: #dc3545 !important; border-color: #f5c2c7 !important; }
+.btn-universal { background: #f8f9fa; color: #495057; border: 1px solid #e1e5ea; border-radius: 12px; padding: .5rem .75rem; display: inline-flex; align-items: center; gap: .375rem; }
+.btn-universal .material-icons { font-size: 18px; }
+.action-buttons .btn.btn-success { background: #eaf6ef !important; color: #198754 !important; border-color: #cfe9da !important; }
+.action-buttons .btn.btn-warning { background: #fff4e6 !important; color: #d97706 !important; border-color: #ffe8cc !important; }
+.action-buttons .btn.btn-info { background: #e7f7ff !important; color: #0ea5e9 !important; border-color: #bfefff !important; }
+

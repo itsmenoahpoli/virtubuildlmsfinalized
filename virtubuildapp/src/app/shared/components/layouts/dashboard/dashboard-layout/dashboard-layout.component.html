@@ -1,0 +1,19 @@
+<div class="dashboard-container">
+  <aside class="sidebar" [class.collapsed]="sidebarCollapsed">
+    <app-dashboard-sidebar
+      [appTitle]="appTitle"
+      [sidebarItems]="sidebarItems"
+    ></app-dashboard-sidebar>
+  </aside>
+
+  <div class="main-content" [class.sidebar-collapsed]="sidebarCollapsed">
+    <app-dashboard-navbar
+      [userProfile]="userProfile$ | async"
+      (toggleSidebar)="toggleSidebar()"
+    ></app-dashboard-navbar>
+
+    <main class="content" style="zoom: 0.85">
+      <ng-content></ng-content>
+    </main>
+  </div>
+</div>

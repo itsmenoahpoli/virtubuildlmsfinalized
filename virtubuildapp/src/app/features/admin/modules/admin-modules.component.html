@@ -1,0 +1,79 @@
+<app-dashboard-layout [appTitle]="'VirtuBuild'">
+<app-page-shell title="Modules" subtitle="Create and manage learning modules">
+  <div class="page-header">
+    <h1>Modules</h1>
+    <button class="btn btn-primary" (click)="createModule()">
+      <span class="btn-icon">➕</span>
+      Add Module
+    </button>
+  </div>
+
+  <div class="content" *ngIf="!loading">
+    <div class="modules-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let m of modules">
+            <td>{{ m.title }}</td>
+            <td>{{ m.description }}</td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn btn-sm btn-secondary" (click)="editModule(m)">Edit</button>
+                <button class="btn btn-sm btn-danger" (click)="deleteModule(m.id)">Delete</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal-overlay" *ngIf="showCreateForm" (click)="cancelCreate($event)">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2>Create Module</h2>
+      <form (ngSubmit)="submitCreate($event)">
+        <label>
+          <span>Title</span>
+          <input [(ngModel)]="newModule.title" name="title" required />
+        </label>
+        <label>
+          <span>Description</span>
+          <input [(ngModel)]="newModule.description" name="description" />
+        </label>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="cancelCreate($event)">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay" *ngIf="showEditForm" (click)="cancelEdit($event)">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2>Edit Module</h2>
+      <form (ngSubmit)="submitEdit($event)">
+        <label>
+          <span>Title</span>
+          <input [(ngModel)]="selectedModule.title" name="edit_title" required />
+        </label>
+        <label>
+          <span>Description</span>
+          <input [(ngModel)]="selectedModule.description" name="edit_description" />
+        </label>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="cancelEdit($event)">Cancel</button>
+          <button type="submit" class="btn btn-primary">Update</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</app-page-shell>
+</app-dashboard-layout>
+
+

@@ -1,0 +1,15 @@
+package.json
+package-lock.json
+node_modules
+npm-debug.log
+.git
+.gitignore
+README.md
+.env
+.nyc_output
+coverage
+.nyc_output
+.coverage
+*.md
+dist
+.DS_Store

@@ -1,0 +1,158 @@
+<app-dashboard-layout [appTitle]="appTitle">
+<div class="progress-tracking">
+  <div class="page-header">
+    <h1>Progress Tracking</h1>
+    <p>Monitor your learning journey and track your achievements</p>
+  </div>
+
+  <div class="progress-content" *ngIf="!loading">
+    <!-- Overall Progress Stats -->
+    <div class="progress-stats-section">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📊</div>
+          <div class="stat-content">
+            <h3>{{ completionStats.totalActivities || 0 }}</h3>
+            <p>Total Activities</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">✅</div>
+          <div class="stat-content">
+            <h3>{{ completionStats.completedActivities || 0 }}</h3>
+            <p>Completed</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-content">
+            <h3>{{ completionStats.inProgressActivities || 0 }}</h3>
+            <p>In Progress</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🎯</div>
+          <div class="stat-content">
+            <h3>{{ getCompletionPercentage(completionStats.completedActivities || 0, completionStats.totalActivities || 0).toFixed(1) }}%</h3>
+            <p>Completion Rate</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Assigned Modules -->
+    <div class="modules-section">
+      <div class="section-header">
+        <h2>Assigned Modules</h2>
+        <p>Your learning modules and progress</p>
+      </div>
+      <div class="modules-grid">
+        <div class="module-card" *ngFor="let module of assignedModules">
+          <div class="module-header">
+            <h3>{{ module.title }}</h3>
+            <span class="module-status" [class]="getProgressStatus(module)">
+              {{ getProgressStatus(module).replace('-', ' ').toUpperCase() }}
+            </span>
+          </div>
+          <div class="module-content">
+            <p class="module-description">{{ module.description }}</p>
+            <div class="module-progress">
+              <div class="progress-info">
+                <span class="progress-text">
+                  {{ module.completedActivities || 0 }} / {{ module.totalActivities || 0 }} activities
+                </span>
+                <span class="progress-percentage">
+                  {{ getCompletionPercentage(module.completedActivities || 0, module.totalActivities || 0).toFixed(1) }}%
+                </span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill"
+                     [style.width.%]="getCompletionPercentage(module.completedActivities || 0, module.totalActivities || 0)">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Assigned Activities -->
+    <div class="activities-section">
+      <div class="section-header">
+        <h2>Assigned Activities</h2>
+        <p>Your lab activities and simulations</p>
+      </div>
+      <div class="activities-list">
+        <div class="activity-item" *ngFor="let activity of assignedActivities">
+          <div class="activity-info">
+            <h4>{{ activity.title }}</h4>
+            <p>{{ activity.description }}</p>
+            <div class="activity-meta">
+              <span class="activity-module">{{ activity.moduleTitle }}</span>
+              <span class="activity-type">{{ activity.type }}</span>
+            </div>
+          </div>
+          <div class="activity-status">
+            <span class="status-badge" [class]="getProgressStatus(activity)">
+              {{ getProgressStatus(activity).replace('-', ' ').toUpperCase() }}
+            </span>
+            <div class="activity-actions">
+              <button class="btn btn-primary"
+                      *ngIf="getProgressStatus(activity) === 'not-started'"
+                      (click)="submitProgress({ activityId: activity.id, status: 'started' })">
+                Start Activity
+              </button>
+              <button class="btn btn-secondary"
+                      *ngIf="getProgressStatus(activity) === 'in-progress'"
+                      (click)="submitProgress({ activityId: activity.id, status: 'completed' })">
+                Mark Complete
+              </button>
+              <button class="btn btn-success"
+                      *ngIf="getProgressStatus(activity) === 'completed'"
+                      disabled>
+                Completed
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- My Progress Details -->
+    <div class="my-progress-section" *ngIf="myProgress">
+      <div class="section-header">
+        <h2>My Progress Details</h2>
+        <p>Detailed view of your learning progress</p>
+      </div>
+      <div class="progress-details">
+        <div class="detail-card">
+          <h3>Learning Statistics</h3>
+          <div class="detail-stats">
+            <div class="detail-item">
+              <span class="detail-label">Total Time Spent:</span>
+              <span class="detail-value">{{ myProgress.totalTimeSpent || 0 }} minutes</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Average Score:</span>
+              <span class="detail-value">{{ myProgress.averageScore || 0 }}%</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Last Activity:</span>
+              <span class="detail-value">{{ myProgress.lastActivityDate | date:'short' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Current Streak:</span>
+              <span class="detail-value">{{ myProgress.currentStreak || 0 }} days</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Loading progress data...</p>
+  </div>
+</div>
+</app-dashboard-layout>

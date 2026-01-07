@@ -1,0 +1,71 @@
+<app-dashboard-layout [appTitle]="appTitle">
+  <app-page-shell title="Activities" subtitle="Browse and access your learning activities.">
+    <div class="activities-content">
+      <div class="module-selector" *ngIf="modules.length > 0">
+        <div class="selector-row">
+          <div class="module-group">
+            <label for="moduleSelect">Filter by Module:</label>
+            <select id="moduleSelect" (change)="onModuleChange(+$any($event.target).value)" class="module-select">
+              <option value="">All Modules</option>
+              <option *ngFor="let module of modules" [value]="module.id">
+                {{ module.title }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="debug-info" style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 4px; font-size: 12px;">
+          <p><strong>Debug:</strong> Found {{ modules.length }} modules, {{ activities.length }} activities</p>
+        </div>
+      </div>
+      <div class="activities-grid" *ngIf="activities.length > 0; else noActivities">
+        <div class="activity-card" *ngFor="let activity of activities">
+          <div class="activity-header">
+            <h3>{{ activity.title }}</h3>
+            <span class="activity-status" [class]="activity.isEnabled ? 'enabled' : 'disabled'">
+              {{ activity.isEnabled ? 'Active' : 'Inactive' }}
+            </span>
+          </div>
+          <div class="activity-content">
+            <p class="activity-description">{{ activity.description }}</p>
+            <div class="activity-steps" *ngIf="activity.steps && activity.steps.length > 0">
+              <h4>Steps:</h4>
+              <ul class="steps-list">
+                <li *ngFor="let step of activity.steps" class="step-item">
+                  <strong>{{ step.name }}</strong>
+                  <p>{{ step.description }}</p>
+                </li>
+              </ul>
+            </div>
+            <div class="activity-meta">
+              <span class="activity-module" *ngIf="activity.moduleTitle">{{ activity.moduleTitle }}</span>
+              <span class="activity-steps-count">{{ activity.steps?.length || 0 }} steps</span>
+              <span class="activity-date">{{ activity.updatedAt | date:'short' }}</span>
+            </div>
+          </div>
+          <div class="activity-actions">
+            <a [routerLink]="['/student/activities', activity.id]" class="btn btn-primary">
+              View Details
+            </a>
+            <a [routerLink]="['/student/simulation', activity.id]" class="btn btn-secondary">
+              Start Activity
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noActivities>
+        <div class="empty-state">
+          <div class="empty-icon">📚</div>
+          <h3>No Activities Available</h3>
+          <p>No activities have been assigned to you yet. Contact your instructor for more information.</p>
+          <div class="debug-info" *ngIf="modules.length > 0">
+            <p><strong>Debug:</strong> Found {{ modules.length }} modules but no activities.</p>
+            <p>Modules: {{ moduleTitles }}</p>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+  </app-page-shell>
+</app-dashboard-layout>
+
+

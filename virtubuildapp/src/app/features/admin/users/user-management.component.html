@@ -1,0 +1,146 @@
+<app-dashboard-layout [appTitle]="'VirtuBuild'">
+<app-page-shell title="User Management" subtitle="Manage users and roles">
+  <div class="page-header">
+    <h1>User Management</h1>
+    <button class="btn btn-primary" (click)="showCreateForm = true">
+      <span class="btn-icon">➕</span>
+      Add New User
+    </button>
+  </div>
+
+  <div class="content" *ngIf="!loading">
+    <div class="users-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users">
+            <td>{{ user.firstName }} {{ user.lastName }}</td>
+            <td>{{ user.email }}</td>
+            <td>
+              <span class="role-badge" [class]="'role-' + (user.roleName || 'unknown')">
+                {{ user.roleName || 'No Role' }}
+              </span>
+            </td>
+            <td>
+              <span class="status-badge" [class]="user.isEnabled ? 'active' : 'inactive'">
+                {{ user.isEnabled ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn btn-sm btn-secondary" (click)="editUser(user)">
+                  Edit
+                </button>
+                <button class="btn btn-sm btn-danger" (click)="deleteUser(user.id)">
+                  Delete
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Create User Modal -->
+  <div class="modal-overlay" *ngIf="showCreateForm" (click)="cancelCreate()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Create New User</h2>
+        <button class="close-btn" (click)="cancelCreate()">×</button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="createUser()">
+          <div class="form-group">
+            <label for="firstName">First Name</label>
+            <input type="text" id="firstName" [(ngModel)]="newUser.firstName" name="firstName" required>
+          </div>
+          <div class="form-group">
+            <label for="lastName">Last Name</label>
+            <input type="text" id="lastName" [(ngModel)]="newUser.lastName" name="lastName" required>
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" [(ngModel)]="newUser.email" name="email" required>
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" [(ngModel)]="newUser.password" name="password" required>
+          </div>
+          <div class="form-group">
+            <label for="userRoleId">Role</label>
+            <select id="userRoleId" [(ngModel)]="newUser.userRoleId" name="userRoleId" required>
+              <option value="">Select Role</option>
+              <option *ngFor="let role of userRoles" [value]="role.id">
+                {{ role.name }}
+              </option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" (click)="cancelCreate()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Create User</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit User Modal -->
+  <div class="modal-overlay" *ngIf="showEditForm" (click)="cancelEdit()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Edit User</h2>
+        <button class="close-btn" (click)="cancelEdit()">×</button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="updateUser()">
+          <div class="form-group">
+            <label for="editFirstName">First Name</label>
+            <input type="text" id="editFirstName" [(ngModel)]="selectedUser.firstName" name="firstName" required>
+          </div>
+          <div class="form-group">
+            <label for="editLastName">Last Name</label>
+            <input type="text" id="editLastName" [(ngModel)]="selectedUser.lastName" name="lastName" required>
+          </div>
+          <div class="form-group">
+            <label for="editEmail">Email</label>
+            <input type="email" id="editEmail" [(ngModel)]="selectedUser.email" name="email" required>
+          </div>
+          <div class="form-group">
+            <label for="editUserRoleId">Role</label>
+            <select id="editUserRoleId" [(ngModel)]="selectedUser.userRoleId" name="userRoleId" required>
+              <option value="">Select Role</option>
+              <option *ngFor="let role of userRoles" [value]="role.id">
+                {{ role.name }}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>
+              <input type="checkbox" [(ngModel)]="selectedUser.isEnabled" name="isEnabled">
+              Active User
+            </label>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" (click)="cancelEdit()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Update User</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Loading users...</p>
+  </div>
+</app-page-shell>
+</app-dashboard-layout>

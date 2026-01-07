@@ -1,0 +1,82 @@
+<div class="h-screen w-screen bg-slate-200">
+  <app-header [links]="headerLinks" class="fixed top-0 left-0 right-0 z-50" />
+
+  <div
+    class="h-full w-full flex justify-center items-center px-4"
+    style="zoom: 0.9"
+  >
+    <div
+      class="w-full sm:w-4/5 md:w-3/5 lg:w-2/5 xl:w-1/4 h-auto bg-white rounded-lg shadow-md border border-gray-200 p-4 -mt-[10%]"
+    >
+      <h1 class="text-xl text-center font-bold">Login</h1>
+      <div class="text-xs mt-2 mb-4" [ngClass]="{
+        'text-gray-500': healthStatus === 'checking',
+        'text-green-600': healthStatus === 'ok',
+        'text-red-600': healthStatus === 'fail'
+      }">
+        {{ healthMessage }}
+      </div>
+
+      <form [formGroup]="signinForm" (ngSubmit)="onSubmit()">
+        <div class="flex flex-col gap-2">
+          <app-form-input
+            label="Email"
+            type="email"
+            id="email"
+            formControlName="email"
+            [errorMessage]="getErrorMessage('email')"
+          />
+
+          <app-form-input
+            label="Password"
+            type="password"
+            id="password"
+            formControlName="password"
+            [errorMessage]="getErrorMessage('password')"
+          />
+
+
+          <button
+            type="submit"
+            [disabled]="!signinForm.valid || healthStatus !== 'ok'"
+            class="bg-blue-500 text-white p-2 rounded-full disabled:bg-gray-300 disabled:cursor-not-allowed"
+          >
+            Login
+          </button>
+
+          <a href="/forgot-password" class="text-xs text-blue-500">
+            Forgot password?
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Error Dialog -->
+  <div *ngIf="showErrorDialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-lg">
+      <div class="flex items-center mb-4">
+        <div class="flex-shrink-0">
+          <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-lg font-medium text-gray-900">Login Error</h3>
+        </div>
+      </div>
+      <div class="mb-6">
+        <p class="text-sm text-gray-500">{{ errorMessage }}</p>
+      </div>
+      <div class="flex justify-end">
+        <button
+          type="button"
+          (click)="closeErrorDialog()"
+          class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+        >
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

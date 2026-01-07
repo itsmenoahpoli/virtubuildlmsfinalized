@@ -1,0 +1,111 @@
+<app-dashboard-layout [appTitle]="appTitle">
+  <app-page-shell title="Student Grades" subtitle="Manage grades by activity with quick overview">
+    <div class="grades-management">
+      <div class="filters-section">
+        <div class="filter-group">
+          <label for="moduleFilter">Module:</label>
+          <select id="moduleFilter" [(ngModel)]="selectedModule" (change)="onModuleChange()">
+            <option [value]="null">All Modules</option>
+            <option *ngFor="let module of modules" [value]="module.id">{{ module.title }}</option>
+          </select>
+        </div>
+
+        <button class="btn btn-secondary" (click)="refreshGrades()" [disabled]="loading || !selectedActivity">
+          <span class="material-icons">refresh</span>
+          Refresh
+        </button>
+      </div>
+
+      <div class="error-message" *ngIf="error">
+        <span class="material-icons">error</span>
+        {{ error }}
+      </div>
+
+      <div class="loading-spinner" *ngIf="loading">
+        <span class="material-icons">hourglass_empty</span>
+        Loading grades...
+      </div>
+
+      <div class="activities-grid" *ngIf="!loading">
+        <div class="activity-card" *ngFor="let activity of getActivitiesByModule(selectedModule)" (click)="openActivityModal(activity)">
+          <div class="activity-header">
+            <h3>{{ activity.title }}</h3>
+            <span class="material-icons">open_in_new</span>
+          </div>
+          <div class="activity-meta">
+            <div class="meta-item">
+              <span class="meta-label">Module</span>
+              <span class="meta-value">{{ getModuleTitleForActivity(activity) }}</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Activity ID</span>
+              <span class="meta-value">#{{ activity.id }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="no-activities" *ngIf="!loading && getActivitiesByModule(selectedModule).length === 0">
+        <span class="material-icons">assignment</span>
+        <h3>No activities found</h3>
+        <p>Select a different module to see activities.</p>
+      </div>
+
+      <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+        <div class="modal-sheet" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <div class="title">
+              <span class="material-icons">grading</span>
+              <h3>{{ modalActivity?.title }}</h3>
+            </div>
+            <button class="btn btn-secondary" (click)="closeModal()">
+              <span class="material-icons">close</span>
+            </button>
+          </div>
+          <div class="modal-content">
+            <div class="modal-columns">
+              <div class="column">
+                <h4>Assessments</h4>
+                <div class="list" *ngIf="modalAssessments.length; else noAssessments">
+                  <div class="list-row" *ngFor="let a of modalAssessments">
+                    <div class="primary">{{ a.title }}</div>
+                    <div class="secondary">#{{ a.id }}</div>
+                  </div>
+                </div>
+                <ng-template #noAssessments>
+                  <div class="empty">No assessments</div>
+                </ng-template>
+              </div>
+              <div class="column">
+                <h4>Submissions</h4>
+                <div class="list" *ngIf="modalSubmissions.length; else noSubs">
+                  <div class="list-row" *ngFor="let s of modalSubmissions">
+                    <div class="primary">User {{ s.userId }}</div>
+                    <div class="secondary">{{ s.createdAt | date:'short' }}</div>
+                  </div>
+                </div>
+                <ng-template #noSubs>
+                  <div class="empty">No submissions</div>
+                </ng-template>
+              </div>
+              <div class="column">
+                <h4>Grades</h4>
+                <div class="list" *ngIf="modalGrades.length; else noGrades">
+                  <div class="list-row" *ngFor="let g of modalGrades">
+                    <div class="primary">User {{ g.userId }}</div>
+                    <div class="badge" [class]="getGradeClass(g.score)">{{ g.score }}%</div>
+                  </div>
+                </div>
+                <ng-template #noGrades>
+                  <div class="empty">No grades yet</div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </app-page-shell>
+</app-dashboard-layout>
+
+

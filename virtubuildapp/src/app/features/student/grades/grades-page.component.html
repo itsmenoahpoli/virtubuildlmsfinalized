@@ -1,0 +1,75 @@
+<app-dashboard-layout [appTitle]="appTitle">
+  <app-page-shell title="Grades" subtitle="Your web analytics dashboard template.">
+    <div class="grades-content">
+      <div class="grades-summary" *ngIf="grades.length > 0">
+        <div class="summary-cards">
+          <div class="summary-card">
+            <div class="card-icon">📊</div>
+            <div class="card-content">
+              <h3>{{ grades.length }}</h3>
+              <p>Total Grades</p>
+            </div>
+          </div>
+          <div class="summary-card">
+            <div class="card-icon">⭐</div>
+            <div class="card-content">
+              <h3>{{ getAverageGrade() }}%</h3>
+              <p>Average Score</p>
+            </div>
+          </div>
+          <div class="summary-card">
+            <div class="card-icon">🎯</div>
+            <div class="card-content">
+              <h3>{{ getHighestGrade() }}%</h3>
+              <p>Highest Score</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grades-list" *ngIf="grades.length > 0; else noGrades">
+        <div class="grades-table">
+          <div class="table-header">
+            <div class="col-activity">Activity</div>
+            <div class="col-score">Score</div>
+            <div class="col-date">Date</div>
+            <div class="col-status">Status</div>
+          </div>
+          <div class="table-body">
+            <div class="grade-row" *ngFor="let grade of grades">
+              <div class="col-activity">
+                <div class="activity-info">
+                  <h4>Activity {{ grade.activityId }}</h4>
+                  <p *ngIf="grade.activityTitle">{{ grade.activityTitle }}</p>
+                </div>
+              </div>
+              <div class="col-score">
+                <span class="score-value" [class]="getScoreClass(grade.score)">
+                  {{ grade.score }}%
+                </span>
+              </div>
+              <div class="col-date">
+                {{ grade.submittedAt | date:'short' }}
+              </div>
+              <div class="col-status">
+                <span class="status-badge" [class]="getStatusClass(grade.score)">
+                  {{ getStatusText(grade.score) }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noGrades>
+        <div class="empty-state">
+          <div class="empty-icon">📝</div>
+          <h3>No Grades Yet</h3>
+          <p>Complete some activities to see your grades here.</p>
+        </div>
+      </ng-template>
+    </div>
+  </app-page-shell>
+</app-dashboard-layout>
+
+

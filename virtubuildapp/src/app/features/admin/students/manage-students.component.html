@@ -1,0 +1,273 @@
+<app-dashboard-layout [appTitle]="'VirtuBuild'">
+  <app-page-shell title="Manage Students" subtitle="Manage student accounts and enrollment">
+    <div class="page-header">
+      <h1>Student Management</h1>
+      <button class="btn btn-primary" (click)="showCreateForm = true">
+        <span class="btn-icon">➕</span>
+        Add New Student
+      </button>
+    </div>
+
+    <div class="loading" *ngIf="loading">
+      Loading students...
+    </div>
+
+    <div class="content" *ngIf="!loading">
+      <!-- Data Table Controls -->
+      <div class="table-controls">
+        <div class="search-section">
+          <div class="search-box">
+            <input
+              type="text"
+              [(ngModel)]="searchTerm"
+              (input)="onSearchChange()"
+              placeholder="Search students by name or email..."
+              class="search-input"
+            >
+            <span class="search-icon">🔍</span>
+          </div>
+        </div>
+        
+        <div class="table-info">
+          <span class="results-count">
+            Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to 
+            {{ Math.min(currentPage * itemsPerPage, totalItems) }} of 
+            {{ totalItems }} students
+          </span>
+          
+          <div class="items-per-page">
+            <label>Show:</label>
+            <select 
+              [(ngModel)]="itemsPerPage" 
+              (change)="onItemsPerPageChange(itemsPerPage)"
+              class="page-select"
+            >
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data Table -->
+      <div class="students-table">
+        <table>
+          <thead>
+            <tr>
+              <th (click)="sort('firstName')" class="sortable">
+                Name
+                <span class="sort-indicator" *ngIf="sortField === 'firstName'">
+                  {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                </span>
+              </th>
+              <th (click)="sort('email')" class="sortable">
+                Email
+                <span class="sort-indicator" *ngIf="sortField === 'email'">
+                  {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                </span>
+              </th>
+              <th (click)="sort('isEnabled')" class="sortable">
+                Status
+                <span class="sort-indicator" *ngIf="sortField === 'isEnabled'">
+                  {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                </span>
+              </th>
+              <th>Role</th>
+              <th (click)="sort('lastLoginAt')" class="sortable">
+                Last Login
+                <span class="sort-indicator" *ngIf="sortField === 'lastLoginAt'">
+                  {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                </span>
+              </th>
+              <th class="actions-header">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let student of paginatedStudents; trackBy: trackByStudentId">
+              <td>
+                <div class="student-info">
+                  <div class="student-avatar">
+                    {{ student.firstName.charAt(0) }}{{ student.lastName.charAt(0) }}
+                  </div>
+                  <div class="student-details">
+                    <span class="student-name">{{ student.firstName }} {{ student.lastName }}</span>
+                    <span class="student-id">ID: {{ student.id }}</span>
+                  </div>
+                </div>
+              </td>
+              <td class="email-cell">{{ student.email }}</td>
+              <td>
+                <span class="status-badge" [class]="student.isEnabled ? 'active' : 'inactive'">
+                  <span class="status-dot"></span>
+                  {{ student.isEnabled ? 'Active' : 'Inactive' }}
+                </span>
+              </td>
+              <td>
+                <span class="role-badge">{{ getRoleName(student) }}</span>
+              </td>
+              <td class="last-login-cell">
+                <span *ngIf="student.lastLoginAt; else neverLoggedIn">
+                  {{ student.lastLoginAt | date:'MMM d, y' }}
+                  <br>
+                  <small>{{ student.lastLoginAt | date:'h:mm a' }}</small>
+                </span>
+                <ng-template #neverLoggedIn>
+                  <span class="never-logged-in">Never</span>
+                </ng-template>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button 
+                    class="btn btn-sm btn-secondary" 
+                    (click)="editStudent(student)"
+                    title="Edit Student"
+                  >
+                    Edit
+                  </button>
+                  <button 
+                    class="btn btn-sm" 
+                    [class]="student.isEnabled ? 'btn-warning' : 'btn-success'"
+                    (click)="toggleStudentStatus(student)"
+                    [title]="student.isEnabled ? 'Disable Account' : 'Enable Account'"
+                  >
+                    {{ student.isEnabled ? 'Disable' : 'Enable' }}
+                  </button>
+                  <button 
+                    class="btn btn-sm btn-info" 
+                    (click)="resetStudentPassword(student)"
+                    title="Reset Password"
+                  >
+                    Reset PW
+                  </button>
+                  <button 
+                    class="btn btn-sm btn-danger" 
+                    (click)="deleteStudent(student.id)"
+                    title="Delete Student"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <!-- Empty State -->
+        <div class="empty-state" *ngIf="filteredStudents.length === 0">
+          <div class="empty-icon">👥</div>
+          <h3>No Students Found</h3>
+          <p *ngIf="searchTerm">
+            No students match your search criteria. Try adjusting your search terms.
+          </p>
+          <p *ngIf="!searchTerm">
+            No students have been added yet. Click "Add New Student" to get started.
+          </p>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination" *ngIf="totalPages > 1">
+        <div class="pagination-info">
+          Page {{ currentPage }} of {{ totalPages }}
+        </div>
+        
+        <div class="pagination-controls">
+          <button 
+            class="btn btn-sm btn-secondary"
+            (click)="onPageChange(currentPage - 1)"
+            [disabled]="currentPage === 1"
+          >
+            Previous
+          </button>
+          
+          <div class="page-numbers">
+            <button
+              *ngFor="let page of getPageNumbers()"
+              class="page-btn"
+              [class.active]="page === currentPage"
+              (click)="onPageChange(page)"
+            >
+              {{ page }}
+            </button>
+          </div>
+          
+          <button 
+            class="btn btn-sm btn-secondary"
+            (click)="onPageChange(currentPage + 1)"
+            [disabled]="currentPage === totalPages"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create Student Modal -->
+    <div class="modal-overlay" *ngIf="showCreateForm" (click)="cancelCreate()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Create New Student</h2>
+          <button class="close-btn" (click)="cancelCreate()">&times;</button>
+        </div>
+        <form (ngSubmit)="createStudent()">
+          <div class="form-group">
+            <label for="firstName">First Name</label>
+            <input type="text" id="firstName" [(ngModel)]="newStudent.firstName" name="firstName" required>
+          </div>
+          <div class="form-group">
+            <label for="lastName">Last Name</label>
+            <input type="text" id="lastName" [(ngModel)]="newStudent.lastName" name="lastName" required>
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" [(ngModel)]="newStudent.email" name="email" required>
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" [(ngModel)]="newStudent.password" name="password" required>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" (click)="cancelCreate()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Create Student</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Edit Student Modal -->
+    <div class="modal-overlay" *ngIf="showEditForm" (click)="cancelEdit()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Edit Student</h2>
+          <button class="close-btn" (click)="cancelEdit()">&times;</button>
+        </div>
+        <form (ngSubmit)="updateStudent()">
+          <div class="form-group">
+            <label for="editFirstName">First Name</label>
+            <input type="text" id="editFirstName" [(ngModel)]="selectedStudent.firstName" name="firstName" required>
+          </div>
+          <div class="form-group">
+            <label for="editLastName">Last Name</label>
+            <input type="text" id="editLastName" [(ngModel)]="selectedStudent.lastName" name="lastName" required>
+          </div>
+          <div class="form-group">
+            <label for="editEmail">Email</label>
+            <input type="email" id="editEmail" [(ngModel)]="selectedStudent.email" name="email" required>
+          </div>
+          <div class="form-group">
+            <label>
+              <input type="checkbox" [(ngModel)]="selectedStudent.isEnabled" name="isEnabled">
+              Active Account
+            </label>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" (click)="cancelEdit()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Update Student</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </app-page-shell>
+</app-dashboard-layout>

@@ -1,0 +1,86 @@
+<app-dashboard-layout [appTitle]="appTitle">
+  <app-page-shell title="Analytics" subtitle="Your web analytics dashboard template.">
+    <div class="analytics-content">
+      <div class="analytics-summary" *ngIf="analytics.length > 0">
+        <div class="summary-cards">
+          <div class="summary-card">
+            <div class="card-icon">⏱️</div>
+            <div class="card-content">
+              <h3>{{ getTotalTimeSpent() }}</h3>
+              <p>Total Time Spent</p>
+            </div>
+          </div>
+          <div class="summary-card">
+            <div class="card-icon">📊</div>
+            <div class="card-content">
+              <h3>{{ analytics.length }}</h3>
+              <p>Activities Completed</p>
+            </div>
+          </div>
+          <div class="summary-card">
+            <div class="card-icon">❌</div>
+            <div class="card-content">
+              <h3>{{ getTotalErrors() }}</h3>
+              <p>Total Errors</p>
+            </div>
+          </div>
+          <div class="summary-card">
+            <div class="card-icon">🎯</div>
+            <div class="card-content">
+              <h3>{{ getAverageAccuracy() }}%</h3>
+              <p>Average Accuracy</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="analytics-details" *ngIf="analytics.length > 0; else noAnalytics">
+        <div class="analytics-table">
+          <div class="table-header">
+            <div class="col-activity">Activity</div>
+            <div class="col-time">Time Spent</div>
+            <div class="col-errors">Errors</div>
+            <div class="col-accuracy">Accuracy</div>
+            <div class="col-date">Date</div>
+          </div>
+          <div class="table-body">
+            <div class="analytics-row" *ngFor="let stat of analytics">
+              <div class="col-activity">
+                <div class="activity-info">
+                  <h4>Activity {{ stat.activityId }}</h4>
+                  <p *ngIf="stat.activityTitle">{{ stat.activityTitle }}</p>
+                </div>
+              </div>
+              <div class="col-time">
+                <span class="time-value">{{ formatTime(stat.timeSpentSeconds) }}</span>
+              </div>
+              <div class="col-errors">
+                <span class="error-count" [class]="getErrorClass(stat.errorCount)">
+                  {{ stat.errorCount }}
+                </span>
+              </div>
+              <div class="col-accuracy">
+                <span class="accuracy-value" [class]="getAccuracyClass(stat.errorCount, stat.timeSpentSeconds)">
+                  {{ getAccuracy(stat.errorCount, stat.timeSpentSeconds) }}%
+                </span>
+              </div>
+              <div class="col-date">
+                {{ stat.completedAt | date:'short' }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noAnalytics>
+        <div class="empty-state">
+          <div class="empty-icon">📈</div>
+          <h3>No Analytics Data</h3>
+          <p>Complete some activities to see your performance analytics here.</p>
+        </div>
+      </ng-template>
+    </div>
+  </app-page-shell>
+</app-dashboard-layout>
+
+

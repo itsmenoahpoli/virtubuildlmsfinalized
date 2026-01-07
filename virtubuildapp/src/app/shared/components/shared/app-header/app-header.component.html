@@ -1,0 +1,23 @@
+<header class="bg-[#322b61] shadow-sm py-3" [class]="class">
+  <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="flex h-16 items-center justify-between">
+      <div class="w-full flex items-center">
+        <div class="w-full">
+          <a href="/" class="text-xl font-extrabold text-white">VirtuBuild</a>
+        </div>
+        <div class="w-full hidden md:block">
+          <div class="w-full ml-10 flex items-baseline justify-end space-x-4">
+            <ng-container *ngFor="let link of links">
+              <a
+                href="{{ link.path }}"
+                class="text-white px-3 py-2 rounded-md text-sm font-medium"
+              >
+                {{ link.label }}
+              </a>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>

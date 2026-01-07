@@ -1,0 +1,29 @@
+.content { background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden; }
+.table-controls { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; background: #f8f9fa; border-bottom: 1px solid #e9ecef; }
+.search-section { flex: 1; max-width: 400px; }
+.search-box { position: relative; display: flex; align-items: center; }
+.search-input { width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem; border: 1px solid #ddd; border-radius: 8px; }
+.search-icon { position: absolute; left: 0.75rem; color: #7f8c8d; }
+.table-info { display: flex; align-items: center; gap: 1rem; }
+.items-per-page { display: flex; align-items: center; gap: .5rem; }
+.page-select { padding: .5rem; border: 1px solid #ddd; border-radius: 6px; }
+.instructors-table { overflow-x: auto; }
+.instructors-table table { width: 100%; border-collapse: collapse; background: white; }
+.instructors-table th, .instructors-table td { padding: 1rem; text-align: left; border-bottom: 1px solid #e9ecef; vertical-align: middle; }
+.instructors-table th { background: #f8f9fa; font-weight: 600; color: #2c3e50; position: sticky; top: 0; z-index: 1; }
+.instructors-table th.sortable { cursor: pointer; }
+.instructors-table tbody tr:hover { background: #f8f9fa; }
+.status-badge { display: inline-flex; align-items: center; gap: .5rem; padding: .375rem .75rem; border-radius: 20px; font-size: .875rem; font-weight: 500; }
+.status-badge.active { background: #d4edda; color: #155724; }
+.status-badge.inactive { background: #f8d7da; color: #721c24; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.action-buttons { display: inline-flex; gap: .5rem; }
+.action-buttons .btn { padding: .5rem .75rem; border-radius: 10px; }
+.action-buttons .btn .material-icons { font-size: 18px; vertical-align: middle; margin-right: 6px; }
+.empty-state { text-align: center; padding: 4rem 2rem; color: #6c757d; }
+.empty-icon { font-size: 3rem; margin-bottom: .5rem; opacity: .5; }
+.pagination { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; background: #f8f9fa; border-top: 1px solid #e9ecef; }
+.page-numbers { display: flex; gap: .25rem; margin: 0 1rem; }
+.page-btn { width: 40px; height: 40px; border: 1px solid #ddd; background: white; color: #6c757d; border-radius: 6px; font-size: .9rem; font-weight: 500; cursor: pointer; }
+.page-btn.active { background: #3498db; border-color: #3498db; color: white; }
+

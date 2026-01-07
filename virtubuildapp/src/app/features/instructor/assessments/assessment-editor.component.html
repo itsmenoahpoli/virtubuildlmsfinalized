@@ -1,0 +1,261 @@
+<app-dashboard-layout [appTitle]="appTitle">
+  <app-page-shell title="Manage Assessments" subtitle="Create and manage assessments for activities">
+    <div class="assessment-editor">
+      <div class="activity-info" *ngIf="activity">
+        <h3>{{ activity.title }}</h3>
+        <p>{{ activity.description || 'No description available' }}</p>
+      </div>
+
+      <div class="error-message" *ngIf="error">
+        <span class="material-icons">error</span>
+        {{ error }}
+      </div>
+
+      <div class="actions-header">
+        <button class="btn btn-primary" (click)="startCreating()">
+          <span class="material-icons">add</span>
+          Create New Assessment
+        </button>
+        <button class="btn btn-secondary" (click)="loadAssessments()" [disabled]="loading">
+          <span class="material-icons">refresh</span>
+          Refresh
+        </button>
+      </div>
+
+      <div class="loading-spinner" *ngIf="loading">
+        <span class="material-icons">hourglass_empty</span>
+        Loading assessments...
+      </div>
+
+      <div class="assessments-list" *ngIf="!loading && !showForm">
+        <div class="assessment-card" *ngFor="let assessment of assessments">
+          <div class="assessment-header">
+            <h4>{{ assessment.title }}</h4>
+            <span class="assessment-status" [class.enabled]="assessment.isEnabled" [class.disabled]="!assessment.isEnabled">
+              {{ assessment.isEnabled ? 'Enabled' : 'Disabled' }}
+            </span>
+          </div>
+          
+          <div class="assessment-content">
+            <p>{{ assessment.description || 'No description' }}</p>
+            <div class="assessment-details">
+              <span class="detail">
+                <span class="material-icons">quiz</span>
+                {{ assessment.questions?.length || 0 }} Questions
+              </span>
+              <span class="detail" *ngIf="assessment.timeLimit">
+                <span class="material-icons">schedule</span>
+                {{ assessment.timeLimit }} min
+              </span>
+              <span class="detail">
+                <span class="material-icons">grade</span>
+                Pass: {{ assessment.passingScore }}%
+              </span>
+            </div>
+          </div>
+
+          <div class="assessment-actions">
+            <button class="btn btn-primary btn-sm" (click)="startEditing(assessment)">
+              <span class="material-icons">edit</span>
+              Edit
+            </button>
+            <button class="btn btn-danger btn-sm" (click)="deleteAssessment(assessment.id)">
+              <span class="material-icons">delete</span>
+              Delete
+            </button>
+          </div>
+        </div>
+
+        <div class="no-assessments" *ngIf="assessments.length === 0">
+          <span class="material-icons">quiz</span>
+          <h3>No assessments found</h3>
+          <p>Create your first assessment for this activity.</p>
+        </div>
+      </div>
+
+      <div class="assessment-form" *ngIf="showForm">
+        <div class="form-header">
+          <h3>{{ editingAssessment ? 'Edit Assessment' : 'Create New Assessment' }}</h3>
+          <button class="btn btn-secondary" (click)="cancelForm()">
+            <span class="material-icons">close</span>
+            Cancel
+          </button>
+        </div>
+
+        <form (ngSubmit)="saveAssessment()" #assessmentForm="ngForm">
+          <div class="form-group">
+            <label for="title">Assessment Title</label>
+            <input 
+              type="text" 
+              id="title" 
+              name="title"
+              [(ngModel)]="(editingAssessment || newAssessment).title" 
+              required 
+              class="form-control"
+              placeholder="Enter assessment title"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea 
+              id="description" 
+              name="description"
+              [(ngModel)]="(editingAssessment || newAssessment).description" 
+              class="form-control"
+              rows="3"
+              placeholder="Enter assessment description"
+            ></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="timeLimit">Time Limit (minutes)</label>
+              <input 
+                type="number" 
+                id="timeLimit" 
+                name="timeLimit"
+                [(ngModel)]="(editingAssessment || newAssessment).timeLimit" 
+                min="1"
+                class="form-control"
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="passingScore">Passing Score (%)</label>
+              <input 
+                type="number" 
+                id="passingScore" 
+                name="passingScore"
+                [(ngModel)]="(editingAssessment || newAssessment).passingScore" 
+                min="0" 
+                max="100"
+                class="form-control"
+              >
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <input 
+                type="checkbox" 
+                [(ngModel)]="(editingAssessment || newAssessment).isEnabled"
+                name="isEnabled"
+              >
+              Enable Assessment
+            </label>
+          </div>
+
+          <div class="questions-section">
+            <div class="questions-header">
+              <h4>Questions</h4>
+              <button type="button" class="btn btn-secondary btn-sm" (click)="addQuestion()">
+                <span class="material-icons">add</span>
+                Add Question
+              </button>
+            </div>
+
+            <div class="questions-list">
+              <div class="question-item" *ngFor="let question of (editingAssessment || newAssessment).questions; let i = index">
+                <div class="question-header">
+                  <h5>Question {{ i + 1 }}</h5>
+                  <button type="button" class="btn btn-danger btn-sm" (click)="removeQuestion(i)">
+                    <span class="material-icons">delete</span>
+                  </button>
+                </div>
+
+                <div class="form-group">
+                  <label>Question Text</label>
+                  <textarea 
+                    [(ngModel)]="question.question" 
+                    name="question_{{ i }}"
+                    class="form-control"
+                    rows="2"
+                    placeholder="Enter your question"
+                  ></textarea>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Question Type</label>
+                    <select [(ngModel)]="question.type" name="type_{{ i }}" class="form-control">
+                      <option value="multiple-choice">Multiple Choice</option>
+                      <option value="true-false">True/False</option>
+                      <option value="short-answer">Short Answer</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Points</label>
+                    <input 
+                      type="number" 
+                      [(ngModel)]="question.points" 
+                      name="points_{{ i }}"
+                      min="1"
+                      class="form-control"
+                    >
+                  </div>
+                </div>
+
+                <div class="form-group" *ngIf="question.type === 'multiple-choice'">
+                  <label>Answer Options</label>
+                  <div class="options-list">
+                    <div class="option-item" *ngFor="let option of question.options; let j = index">
+                      <input 
+                        type="radio" 
+                        name="correct_{{ i }}" 
+                        [value]="j"
+                        [(ngModel)]="question.correctAnswer"
+                      >
+                      <input 
+                        type="text" 
+                        [(ngModel)]="question.options![j]" 
+                        class="form-control option-input"
+                        placeholder="Option {{ j + 1 }}"
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group" *ngIf="question.type === 'true-false'">
+                  <label>Correct Answer</label>
+                  <select [(ngModel)]="question.correctAnswer" name="correct_{{ i }}" class="form-control">
+                    <option value="true">True</option>
+                    <option value="false">False</option>
+                  </select>
+                </div>
+
+                <div class="form-group" *ngIf="question.type === 'short-answer'">
+                  <label>Correct Answer</label>
+                  <input 
+                    type="text" 
+                    [(ngModel)]="question.correctAnswer" 
+                    name="correct_{{ i }}"
+                    class="form-control"
+                    placeholder="Enter correct answer"
+                  >
+                </div>
+              </div>
+
+              <div class="no-questions" *ngIf="(editingAssessment || newAssessment).questions.length === 0">
+                <p>No questions added yet. Click "Add Question" to get started.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" [disabled]="!assessmentForm.valid">
+              <span class="material-icons">save</span>
+              {{ editingAssessment ? 'Update Assessment' : 'Create Assessment' }}
+            </button>
+            <button type="button" class="btn btn-secondary" (click)="cancelForm()">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </app-page-shell>
+</app-dashboard-layout>
+
+

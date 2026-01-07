@@ -1,0 +1,166 @@
+<app-dashboard-layout [appTitle]="appTitle">
+  <app-page-shell title="Dashboard" subtitle="Your learning dashboard overview.">
+    <div class="dashboard-content">
+      <div class="stats-section">
+        <h2>Statistics Overview</h2>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <span class="material-icons">assignment</span>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{ statistics.totalActivities }}</div>
+              <div class="stat-label">Total Activities</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <span class="material-icons">check_circle</span>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{ statistics.completedActivities }}</div>
+              <div class="stat-label">Completed</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <span class="material-icons">grade</span>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{ statistics.averageGrade }}%</div>
+              <div class="stat-label">Average Grade</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <span class="material-icons">quiz</span>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{ statistics.assessmentsTaken }}</div>
+              <div class="stat-label">Assessments Taken</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="recent-section">
+        <div class="section-header">
+          <h2>Recent Activity</h2>
+          <div class="filter-controls">
+            <select [(ngModel)]="selectedFilter" (change)="onFilterChange()" class="filter-select">
+              <option value="all">All Activities</option>
+              <option value="activities">Activities</option>
+              <option value="modules">Modules</option>
+              <option value="grades">Grades</option>
+              <option value="assessments">Assessments</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="activity-sections">
+          <div class="activity-section" *ngIf="selectedFilter === 'all' || selectedFilter === 'activities'">
+            <h3>Recent Activities</h3>
+            <div class="activity-list" *ngIf="recentActivities.length > 0; else noActivities">
+              <div class="activity-item" *ngFor="let activity of recentActivities">
+                <div class="activity-icon">
+                  <span class="material-icons">assignment</span>
+                </div>
+                <div class="activity-content">
+                  <div class="activity-title">{{ activity.title }}</div>
+                  <div class="activity-description">{{ activity.description }}</div>
+                  <div class="activity-meta">
+                    <span class="activity-status" [class]="activity.isEnabled ? 'enabled' : 'disabled'">
+                      {{ activity.isEnabled ? 'Active' : 'Inactive' }}
+                    </span>
+                    <span class="activity-steps">{{ activity.steps?.length || 0 }} steps</span>
+                    <span class="activity-date">{{ activity.updatedAt | date:'short' }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <ng-template #noActivities>
+              <div class="empty-state">
+                <p>No recent activities found.</p>
+              </div>
+            </ng-template>
+          </div>
+
+          <div class="activity-section" *ngIf="selectedFilter === 'all' || selectedFilter === 'modules'">
+            <h3>Available Modules</h3>
+            <div class="activity-list" *ngIf="modules.length > 0; else noModules">
+              <div class="activity-item" *ngFor="let module of modules">
+                <div class="activity-icon">
+                  <span class="material-icons">folder</span>
+                </div>
+                <div class="activity-content">
+                  <div class="activity-title">{{ module.title }}</div>
+                  <div class="activity-description">{{ module.description }}</div>
+                  <div class="activity-meta">
+                    <span class="activity-status" [class]="module.isEnabled ? 'enabled' : 'disabled'">
+                      {{ module.isEnabled ? 'Active' : 'Inactive' }}
+                    </span>
+                    <span class="activity-steps">{{ module.activities?.length || 0 }} activities</span>
+                    <span class="activity-date">{{ module.updatedAt | date:'short' }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <ng-template #noModules>
+              <div class="empty-state">
+                <p>No modules found.</p>
+              </div>
+            </ng-template>
+          </div>
+
+          <div class="activity-section" *ngIf="selectedFilter === 'all' || selectedFilter === 'grades'">
+            <h3>Recent Grades</h3>
+            <div class="activity-list" *ngIf="recentGrades.length > 0; else noGrades">
+              <div class="activity-item" *ngFor="let grade of recentGrades">
+                <div class="activity-icon">
+                  <span class="material-icons">grade</span>
+                </div>
+                <div class="activity-content">
+                  <div class="activity-title">{{ grade.activityTitle }}</div>
+                  <div class="activity-meta">
+                    <span class="grade-score">{{ grade.score }}%</span>
+                    <span class="activity-date">{{ grade.updatedAt | date:'short' }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <ng-template #noGrades>
+              <div class="empty-state">
+                <p>No recent grades found.</p>
+              </div>
+            </ng-template>
+          </div>
+
+          <div class="activity-section" *ngIf="selectedFilter === 'all' || selectedFilter === 'assessments'">
+            <h3>Recent Assessments</h3>
+            <div class="activity-list" *ngIf="recentAssessments.length > 0; else noAssessments">
+              <div class="activity-item" *ngFor="let assessment of recentAssessments">
+                <div class="activity-icon">
+                  <span class="material-icons">quiz</span>
+                </div>
+                <div class="activity-content">
+                  <div class="activity-title">{{ assessment.title }}</div>
+                  <div class="activity-meta">
+                    <span class="assessment-status" [class]="assessment.status">{{ assessment.status }}</span>
+                    <span class="activity-date">{{ assessment.updatedAt | date:'short' }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <ng-template #noAssessments>
+              <div class="empty-state">
+                <p>No recent assessments found.</p>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+  </app-page-shell>
+</app-dashboard-layout>
+
+
