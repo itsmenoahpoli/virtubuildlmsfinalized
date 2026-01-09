@@ -67,9 +67,10 @@ Welcome to the VirtuBuild documentation hub. This README serves as a central nav
 | Document | Description | Link |
 |----------|-------------|------|
 | **Tech Stack & Environment** | Complete guide to technologies, prerequisites, frameworks, libraries, and environment setup (Docker & Localhost) | [📘 TECH_STACK.md](./docs/TECH_STACK.md) |
+| **Docker Setup Guide** | Comprehensive Docker-focused setup, management, and troubleshooting guide | [🐳 DOCKER_SETUP_GUIDE.md](./docs/DOCKER_SETUP_GUIDE.md) |
 | **Frontend Application** | Angular application documentation with sitemap, features, and development guide | [📱 APP_README.md](./docs/APP_README.md) |
 | **Backend API** | Node.js/Express API documentation with endpoints, database management, and configuration | [🔌 API_README.md](./docs/API_README.md) |
-| **Docker Setup** | Docker-specific setup and deployment guide | [🐳 DOCKER_README.md](./DOCKER_README.md) |
+| **Docker Overview** | Basic Docker setup and deployment guide | [🐳 DOCKER_README.md](./DOCKER_README.md) |
 
 ### 🗺️ Application Sitemap
 
@@ -275,7 +276,7 @@ For more commands, see:
 1. **New to the project?** Start with [TECH_STACK.md](./docs/TECH_STACK.md) for environment setup
 2. **Working on frontend?** See [APP_README.md](./docs/APP_README.md) for Angular app structure
 3. **Working on backend?** See [API_README.md](./docs/API_README.md) for API endpoints
-4. **Setting up Docker?** See [DOCKER_README.md](./DOCKER_README.md) for container setup
+4. **Setting up Docker?** See [DOCKER_SETUP_GUIDE.md](./docs/DOCKER_SETUP_GUIDE.md) for a comprehensive container setup guide
 
 ### For Users
 

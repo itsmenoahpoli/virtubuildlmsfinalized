@@ -1,6 +1,8 @@
 # VirtuBuild Docker Setup
 
-This Docker configuration runs both the API and frontend applications in a single container, along with PostgreSQL and pgAdmin.
+This Docker configuration runs both the API and frontend applications in a single container architecture, along with PostgreSQL and pgAdmin.
+
+> 📘 **Looking for a more detailed guide?** Check out the [Comprehensive Docker Setup Guide](./docs/DOCKER_SETUP_GUIDE.md) for in-depth configuration, database management, and troubleshooting.
 
 ## Services
 
